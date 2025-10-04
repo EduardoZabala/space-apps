@@ -137,7 +137,7 @@ weather-backend/
 
 ```env
 # CORS - Orígenes permitidos
-ALLOWED_ORIGINS=http://localhost:5173,http://localhost:5174
+ALLOWED_ORIGINS=http://localhost:5173,http://localhost:5173
 
 # Proveedor de datos (mock | opendap)
 DATA_PROVIDER=mock

@@ -38,10 +38,10 @@ if lsof -ti:8000 > /dev/null 2>&1; then
     echo -e "${GREEN}✓ Puerto 8000 liberado${NC}"
 fi
 
-if lsof -ti:5174 > /dev/null 2>&1; then
-    echo -e "${YELLOW}Deteniendo procesos en puerto 5174...${NC}"
-    lsof -ti:5174 | xargs kill -9
-    echo -e "${GREEN}✓ Puerto 5174 liberado${NC}"
+if lsof -ti:5173 > /dev/null 2>&1; then
+    echo -e "${YELLOW}Deteniendo procesos en puerto 5173...${NC}"
+    lsof -ti:5173 | xargs kill -9
+    echo -e "${GREEN}✓ Puerto 5173 liberado${NC}"
 fi
 
 # Limpiar archivos de log

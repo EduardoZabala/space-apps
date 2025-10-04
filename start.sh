@@ -27,9 +27,9 @@ if check_port 8000; then
     lsof -ti:8000 | xargs kill -9 2>/dev/null
 fi
 
-if check_port 5174; then
-    echo -e "${YELLOW}Puerto 5174 en uso. Deteniendo proceso...${NC}"
-    lsof -ti:5174 | xargs kill -9 2>/dev/null
+if check_port 5173; then
+    echo -e "${YELLOW}Puerto 5173 en uso. Deteniendo proceso...${NC}"
+    lsof -ti:5173 | xargs kill -9 2>/dev/null
 fi
 
 echo ""
@@ -94,10 +94,10 @@ FRONTEND_PID=$!
 # Esperar a que el frontend inicie
 echo -n "Esperando a que el frontend esté listo"
 for i in {1..15}; do
-    if curl -s http://localhost:5174 > /dev/null 2>&1; then
+    if curl -s http://localhost:5173 > /dev/null 2>&1; then
         echo ""
         echo -e "${GREEN}✓ Frontend iniciado correctamente${NC}"
-        echo -e "${GREEN}  URL: http://localhost:5174${NC}"
+        echo -e "${GREEN}  URL: http://localhost:5173${NC}"
         break
     fi
     echo -n "."
@@ -109,7 +109,7 @@ echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━�
 echo -e "${GREEN}✨ ¡Sistema iniciado correctamente!${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-echo -e "${GREEN}📱 Aplicación Frontend:${NC} http://localhost:5174"
+echo -e "${GREEN}📱 Aplicación Frontend:${NC} http://localhost:5173"
 echo -e "${GREEN}📡 API Backend:${NC}         http://localhost:8000"
 echo -e "${GREEN}📚 Documentación API:${NC}   http://localhost:8000/docs"
 echo ""
@@ -135,8 +135,8 @@ trap cleanup INT TERM
 
 # Abrir navegador automáticamente (opcional, comentado por defecto)
 # sleep 2
-# open http://localhost:5174  # macOS
-# xdg-open http://localhost:5174  # Linux
+# open http://localhost:5173  # macOS
+# xdg-open http://localhost:5173  # Linux
 
 # Mantener el script corriendo y mostrar logs
 echo -e "${BLUE}📝 Logs en tiempo real (Ctrl+C para salir):${NC}"
