@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react'
 type WeatherReportData = {
   title: string
   location: string
-  datetime: string
+  startDate: string
+  endDate: string
   temperatureC?: number
   humidity?: number
   windSpeed?: number
@@ -20,7 +21,8 @@ export default function WeatherReport() {
   const [data, setData] = useState<WeatherReportData>({
     title: 'Reporte meteorológico',
     location: '',
-    datetime: new Date().toISOString().slice(0, 16), // yyyy-mm-ddThh:mm
+    startDate: new Date().toISOString().slice(0, 10),
+    endDate: new Date().toISOString().slice(0, 10),
     temperatureC: undefined,
     humidity: undefined,
     windSpeed: undefined,
@@ -34,13 +36,25 @@ export default function WeatherReport() {
   })
 
   const [showPreview, setShowPreview] = useState(true)
+  const [dateError, setDateError] = useState('')
 
   useEffect(() => {
     // Keep preview open by default on first render
   }, [])
 
   function update<K extends keyof WeatherReportData>(key: K, value: WeatherReportData[K]) {
-    setData((d) => ({ ...d, [key]: value }))
+    setData((d) => {
+      const newData = { ...d, [key]: value }
+      if (key === 'startDate' || key === 'endDate') {
+        if (newData.startDate && newData.endDate && newData.endDate < newData.startDate) {
+          setDateError('La fecha final debe ser mayor o igual a la fecha inicio')
+          return d
+        } else {
+          setDateError('')
+        }
+      }
+      return newData
+    })
   }
 
   function tempF(): number | undefined {
@@ -119,14 +133,29 @@ export default function WeatherReport() {
               <div className="weather-form-field">
                 <label className="weather-form-label">
                   <i className="fas fa-calendar-alt"></i>
-                  Fecha y hora
+                  Fecha inicio
                 </label>
                 <input 
-                  type="datetime-local" 
+                  type="date" 
                   className="weather-form-input" 
-                  value={data.datetime} 
-                  onChange={(e) => update('datetime', e.target.value)} 
+                  value={data.startDate} 
+                  onChange={(e) => update('startDate', e.target.value)} 
                 />
+              </div>
+
+              <div className="weather-form-field">
+                <label className="weather-form-label">
+                  <i className="fas fa-calendar-alt"></i>
+                  Fecha final
+                </label>
+                <input 
+                  type="date" 
+                  className="weather-form-input" 
+                  value={data.endDate} 
+                  onChange={(e) => update('endDate', e.target.value)} 
+                  style={{ borderColor: dateError ? '#dc3545' : undefined }}
+                />
+                {dateError && <div style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '0.25rem' }}>{dateError}</div>}
               </div>
 
               <div className="weather-form-field">
@@ -279,10 +308,11 @@ export default function WeatherReport() {
               </div>
               <div className="weather-meta-item">
                 <i className="fas fa-calendar-alt"></i>
-                <span>{data.datetime ? new Date(data.datetime).toLocaleString('es-ES', { 
-                  dateStyle: 'full', 
-                  timeStyle: 'short' 
-                }) : 'Fecha no especificada'}</span>
+                <span>
+                  {data.startDate && data.endDate 
+                    ? `${new Date(data.startDate).toLocaleDateString('es-ES', { dateStyle: 'long' })} - ${new Date(data.endDate).toLocaleDateString('es-ES', { dateStyle: 'long' })}`
+                    : 'Fechas no especificadas'}
+                </span>
               </div>
             </div>
           </div>
