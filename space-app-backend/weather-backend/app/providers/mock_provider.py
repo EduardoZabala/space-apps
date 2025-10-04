@@ -1,5 +1,6 @@
 """
-Proveedor de datos sintéticos para desarrollo y pruebas.
+Proveedor de datos climatológicos sintéticos pero realistas.
+Genera datos basados en patrones meteorológicos reales y ubicación geográfica.
 """
 import numpy as np
 import pandas as pd
@@ -7,8 +8,9 @@ from .base import WeatherDataProvider
 
 class MockProvider(WeatherDataProvider):
     """
-    Genera datos meteorológicos sintéticos pero realistas.
-    Útil para desarrollo sin necesidad de datos reales de NASA.
+    Genera datos meteorológicos sintéticos basados en climatología real.
+    Utiliza modelos de variación estacional, latitudinal y aleatoria realista.
+    Ideal para desarrollo y demostración sin necesidad de conexión a NASA.
     """
     
     def fetch_historical_data(
@@ -17,31 +19,92 @@ class MockProvider(WeatherDataProvider):
         lon: float,
         target_month: int,
         target_day: int,
-        years_back: int = 10
+        years_back: int = 20
     ) -> pd.DataFrame:
         """
-        Genera datos sintéticos basados en patrones estacionales.
+        Genera datos climatológicos sintéticos basados en ubicación y época del año.
+        
+        Factores considerados:
+        - Latitud: Temperatura base según distancia del ecuador
+        - Estacionalidad: Variación según mes del año
+        - Hemisferio: Estaciones invertidas en hemisferio sur
+        - Variabilidad interanual: Cambios año a año realistas
+        - Patrones de precipitación y humedad correlacionados con temperatura
         """
-        np.random.seed(int(abs(lat * 1000 + lon * 100)))  # Seed basado en ubicación
+        # Semilla basada en ubicación para consistencia
+        np.random.seed(int(abs(lat * 1000 + lon * 100 + target_month * 10 + target_day)))
         
         current_year = 2024
         years = list(range(current_year - years_back, current_year))
         
-        # Patrón base según mes (simulando estaciones)
-        base_temp = 15 + 10 * np.sin(2 * np.pi * (target_month - 3) / 12)
-        base_humidity = 60 + 20 * np.cos(2 * np.pi * (target_month - 6) / 12)
+        # Determinar hemisferio para ajustar estaciones
+        is_northern = lat >= 0
+        effective_month = target_month if is_northern else ((target_month + 6) % 12) or 12
+        
+        # Temperatura base según latitud (más cálido cerca del ecuador)
+        abs_lat = abs(lat)
+        if abs_lat < 23.5:  # Trópicos
+            base_temp = 25 + (23.5 - abs_lat) * 0.3
+            temp_variation = 5
+        elif abs_lat < 35:  # Subtrópicos
+            base_temp = 20 + (35 - abs_lat) * 0.4
+            temp_variation = 8
+        elif abs_lat < 50:  # Templadas
+            base_temp = 12 + (50 - abs_lat) * 0.5
+            temp_variation = 12
+        elif abs_lat < 66.5:  # Subpolares
+            base_temp = 5 + (66.5 - abs_lat) * 0.3
+            temp_variation = 15
+        else:  # Polares
+            base_temp = -10
+            temp_variation = 20
+        
+        # Ajuste estacional (máximo en verano, mínimo en invierno)
+        seasonal_factor = np.sin(2 * np.pi * (effective_month - 3) / 12)
         
         data = []
         for year in years:
-            # Variabilidad año a año
-            temp_variation = np.random.normal(0, 3)
-            humidity_variation = np.random.normal(0, 10)
+            # Variación año a año (simula El Niño, La Niña, etc.)
+            year_anomaly = np.random.normal(0, 1.5)
             
-            temp = base_temp + temp_variation + (lat / 10)  # Ajuste por latitud
-            humidity = max(20, min(100, base_humidity + humidity_variation))
-            wind_speed = abs(np.random.normal(8, 3))
-            wind_dir = np.random.uniform(0, 360)
-            precip = max(0, np.random.exponential(2) if humidity > 70 else np.random.exponential(0.5))
+            # Temperatura con todos los factores
+            temp = base_temp + (seasonal_factor * temp_variation) + year_anomaly
+            temp += np.random.normal(0, 2)  # Variabilidad diaria
+            
+            # Humedad (inversamente proporcional a temperatura en general)
+            humidity_base = 70 - (temp - 15) * 1.5
+            # Ajuste por proximidad al agua (simplificado)
+            if abs(lon) > 150 or abs(lon) < 30:  # Cerca de océanos
+                humidity_base += 10
+            humidity = max(20, min(100, humidity_base + np.random.normal(0, 8)))
+            
+            # Viento (mayor en latitudes medias y costas)
+            wind_base = 5 + abs(abs_lat - 45) * 0.1
+            if abs(lon) > 150 or abs(lon) < 30:  # Costas
+                wind_base += 3
+            wind_speed = max(0, wind_base + np.random.normal(0, 3))
+            
+            # Dirección del viento (predominantemente del oeste en latitudes medias)
+            if 30 < abs_lat < 60:
+                wind_dir = np.random.normal(270, 45) % 360  # Del oeste
+            else:
+                wind_dir = np.random.uniform(0, 360)
+            
+            # Precipitación (correlacionada con humedad y estación)
+            if humidity > 70:
+                precip_rate = 2.5
+            elif humidity > 50:
+                precip_rate = 1.0
+            else:
+                precip_rate = 0.3
+            
+            # Más lluvia en verano en trópicos, en invierno en mediterráneo
+            if abs_lat < 35 and seasonal_factor > 0:
+                precip_rate *= 1.8
+            elif 35 < abs_lat < 45 and seasonal_factor < 0:
+                precip_rate *= 1.5
+                
+            precipitation = max(0, np.random.exponential(precip_rate))
             
             data.append({
                 "year": year,
@@ -49,7 +112,7 @@ class MockProvider(WeatherDataProvider):
                 "humidity": round(humidity, 1),
                 "windSpeed": round(wind_speed, 1),
                 "windDirection": round(wind_dir, 1),
-                "precipitation": round(precip, 1)
+                "precipitation": round(precipitation, 1)
             })
         
         return pd.DataFrame(data)

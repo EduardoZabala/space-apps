@@ -15,7 +15,7 @@ from .schemas import (
 )
 from .predictor import predict_for_point
 from .providers.mock_provider import MockProvider
-# from .providers.opendap_provider import OpendapProvider
+from .providers.opendap_provider import OpendapProvider
 
 load_dotenv()
 
@@ -40,12 +40,19 @@ app.add_middleware(
 # Selección de proveedor de datos
 if PROVIDER == "mock":
     data_provider = MockProvider()
+    print("📊 Usando MockProvider - Datos sintéticos")
+elif PROVIDER == "opendap":
+    earthdata_user = os.getenv("EARTHDATA_USERNAME")
+    earthdata_pass = os.getenv("EARTHDATA_PASSWORD")
+    
+    if not earthdata_user or not earthdata_pass:
+        raise ValueError("Credenciales de NASA EarthData no configuradas en .env")
+    
+    data_provider = OpendapProvider(earthdata_user, earthdata_pass)
+    print(f"🛰️  Usando OpendapProvider - Datos reales de NASA MERRA-2")
+    print(f"👤 Usuario: {earthdata_user}")
 else:
-    # TODO: Implementar OpendapProvider cuando esté listo
-    # earthdata_user = os.getenv("EARTHDATA_USERNAME")
-    # earthdata_pass = os.getenv("EARTHDATA_PASSWORD")
-    # data_provider = OpendapProvider(earthdata_user, earthdata_pass)
-    raise ValueError(f"Proveedor '{PROVIDER}' no soportado. Use 'mock'.")
+    raise ValueError(f"Proveedor '{PROVIDER}' no soportado. Use 'mock' o 'opendap'.")
 
 
 @app.get("/")

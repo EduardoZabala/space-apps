@@ -43,13 +43,13 @@ def predict_for_point(
     target_month = target_date.month
     target_day = target_date.day
     
-    # Obtener datos históricos
+    # Obtener datos históricos (20 años para datos reales de NASA)
     df = provider.fetch_historical_data(
         lat=lat,
         lon=lon,
         target_month=target_month,
         target_day=target_day,
-        years_back=10
+        years_back=20
     )
     
     if df.empty:
