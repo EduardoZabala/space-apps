@@ -1,16 +1,14 @@
 import './App.css'
+import WeatherReport from './components/WeatherReport'
 
 function App() {
   return (
     <div className="container py-5">
-      <h1 className="mb-4">React + Vite + Bootstrap</h1>
-      <button className="btn btn-primary me-2">Primario</button>
-      <button className="btn btn-outline-secondary">Secundario</button>
+      <h1 className="mb-4">Space Apps — Plantilla de reporte meteorológico</h1>
 
-      <div className="alert alert-success mt-4" role="alert">
-        ¡Todo funcionando!
-      </div>
+      <WeatherReport />
     </div>
-  );
+  )
 }
-export default App;
+
+export default App
