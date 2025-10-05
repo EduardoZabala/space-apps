@@ -1,5 +1,6 @@
 # 🌤️ Weather Prediction System - NASA Space Apps Challenge 2025
-## Integrates
+## 👥 Team
+**Team Members:**
 - Sebastian Villa Castillo
 - Juan Sebastian Echeverri Gallego
 - Juan David Velasquez Murillo
@@ -529,12 +530,6 @@ Contributions are welcome! Please follow these steps:
 
 This project was developed for the NASA Space Apps Challenge 2025.
 
-## 👥 Team
-
-**Team Members:**
-- Eduardo Zabala
-- Jhon Zabala
-- [Add other team members]
 
 **Contact:**
 - Repository: [github.com/EduardoZabala/space-apps](https://github.com/EduardoZabala/space-apps)
