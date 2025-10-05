@@ -305,7 +305,7 @@ export default function WeatherDetail({ weatherData, location, targetDate, onBac
               Weather Forecast
             </h1>
             <div className="weather-actions">
-              <button className="weather-btn weather-btn-success" onClick={exportToCSV}>
+              <button className="weather-btn" onClick={exportToCSV}>
                 <i className="fas fa-file-excel"></i>
                 Export Excel
               </button>
@@ -348,7 +348,7 @@ export default function WeatherDetail({ weatherData, location, targetDate, onBac
 
         {/* Prediction Confidence */}
         <div className="confidence-banner" style={{ 
-          background: `linear-gradient(135deg, ${getConfidenceColor(weatherData.confidence)} 0%, ${getConfidenceColor(weatherData.confidence)}dd 100%)`,
+          background: 'linear-gradient(135deg, #0B3D91 0%, #07255C 100%)',
           color: 'white',
           padding: '1.5rem',
           borderRadius: '15px',

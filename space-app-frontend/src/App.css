@@ -75,6 +75,12 @@
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+  background-color: #0a192f;
+  background-image: 
+    radial-gradient(white 1px, transparent 0),
+    radial-gradient(white 1px, transparent 0);
+  background-size: 50px 50px, 150px 150px;
+  background-position: 0 0, 25px 25px;
 }
 
 .weather-page {
