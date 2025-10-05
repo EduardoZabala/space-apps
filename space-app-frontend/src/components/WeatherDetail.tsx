@@ -287,6 +287,11 @@ export default function WeatherDetail({ weatherData, location, targetDate, onBac
 
   // Determinar el className del contenedor basado en el tipo de clima
   const weatherClassName = `weather-${weatherData.prediction.weatherType}`
+  
+  console.log('WeatherDetail - Tipo de clima:', weatherData.prediction.weatherType)
+  console.log('WeatherDetail - Temperatura:', weatherData.prediction.temperatureC)
+  console.log('WeatherDetail - Precipitación:', weatherData.prediction.precipitation)
+  console.log('WeatherDetail - Probabilidad de nieve:', weatherData.prediction.snowProbability)
 
   return (
     <div className={`weather-container ${weatherClassName}`}>
@@ -321,11 +326,11 @@ export default function WeatherDetail({ weatherData, location, targetDate, onBac
         <div className="weather-type-banner" style={{
           background: weatherData.prediction.weatherType === 'sunny' ? 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)' :
                       weatherData.prediction.weatherType === 'rainy' ? 'linear-gradient(135deg, #4A90E2 0%, #357ABD 100%)' :
-                      weatherData.prediction.weatherType === 'snowy' ? 'linear-gradient(135deg, #E0F7FA 0%, #B2EBF2 100%)' :
+                      weatherData.prediction.weatherType === 'snowy' ? 'linear-gradient(135deg, #e0e1faff 0%, #B2EBF2 100%)' :
                       weatherData.prediction.weatherType === 'stormy' ? 'linear-gradient(135deg, #2C3E50 0%, #34495E 100%)' :
                       weatherData.prediction.weatherType === 'foggy' ? 'linear-gradient(135deg, #DCDCDC 0%, #C0C0C0 100%)' :
                       'linear-gradient(135deg, #B0C4DE 0%, #D3D3D3 100%)',
-          color: weatherData.prediction.weatherType === 'stormy' ? 'white' : weatherData.prediction.weatherType === 'snowy' ? '#333' : 'white',
+          color: weatherData.prediction.weatherType === 'stormy' ? 'white' : weatherData.prediction.weatherType === 'snowy' ? '#4e56b1ff' : 'white',
           padding: '2rem',
           borderRadius: '15px',
           marginBottom: '1.5rem',

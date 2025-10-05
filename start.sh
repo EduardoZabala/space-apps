@@ -55,7 +55,7 @@ fi
 
 # Iniciar backend en background
 echo -e "${GREEN}✓ Iniciando servidor FastAPI en puerto 8000...${NC}"
-python -m uvicorn app.main:app --reload --port 8000 > /tmp/weather-backend.log 2>&1 &
+python -m uvicorn app.main:app --port 8000 > /tmp/weather-backend.log 2>&1 &
 BACKEND_PID=$!
 
 # Esperar a que el backend inicie

@@ -7,6 +7,8 @@ interface WeatherEffectsProps {
 
 export default function WeatherEffects({ weatherType }: WeatherEffectsProps) {
   useEffect(() => {
+    console.log('WeatherEffects - weatherType recibido:', weatherType)
+    
     // Limpiar efectos anteriores
     const existingEffects = document.querySelector('.weather-effects')
     if (existingEffects) {
@@ -19,26 +21,36 @@ export default function WeatherEffects({ weatherType }: WeatherEffectsProps) {
     document.body.appendChild(effectsContainer)
 
     // Generar efectos según el tipo de clima
-    switch (weatherType.toLowerCase()) {
+    const normalizedWeatherType = weatherType.toLowerCase().trim()
+    console.log('WeatherEffects - weatherType normalizado:', normalizedWeatherType)
+    
+    switch (normalizedWeatherType) {
       case 'rainy':
+        console.log('Aplicando efecto de lluvia')
         createRainEffect(effectsContainer)
         break
       case 'snowy':
+        console.log('Aplicando efecto de nieve')
         createSnowEffect(effectsContainer)
         break
       case 'stormy':
+        console.log('Aplicando efecto de tormenta')
         createStormEffect(effectsContainer)
         break
       case 'cloudy':
+        console.log('Aplicando efecto nublado')
         createCloudEffect(effectsContainer)
         break
       case 'sunny':
+        console.log('Aplicando efecto soleado')
         createSunEffect(effectsContainer)
         break
       case 'foggy':
+        console.log('Aplicando efecto de niebla')
         createFogEffect(effectsContainer)
         break
       default:
+        console.log('Tipo de clima no reconocido, aplicando efecto nublado por defecto')
         createCloudEffect(effectsContainer)
     }
 

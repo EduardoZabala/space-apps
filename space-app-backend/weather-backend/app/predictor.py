@@ -15,13 +15,14 @@ def determine_weather_type(temp: float, humidity: float, precip: float, cloud_co
     """
     Determina el tipo de clima basado en las condiciones meteorológicas.
     """
+    # Nieve: temperatura menor a 2°C con precipitación mayor a 0.1mm
+    # Se verifica primero para que tenga prioridad sobre lluvia
+    if temp < 2 and precip > 0.1:
+        return "snowy"
+    
     # Tormenta: lluvia intensa con viento fuerte
     if precip > 10 and wind_speed > 15:
         return "stormy"
-    
-    # Nieve: temperatura bajo cero con precipitación
-    if temp < 2 and precip > 2:
-        return "snowy"
     
     # Lluvia: precipitación significativa
     if precip > 5:
