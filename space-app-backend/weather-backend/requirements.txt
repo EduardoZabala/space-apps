@@ -9,3 +9,4 @@ netCDF4==1.7.2
 requests==2.32.3
 pydap==3.5.8
 jinja2==3.1.6
+dask==2025.9.1sk==2024.9.1

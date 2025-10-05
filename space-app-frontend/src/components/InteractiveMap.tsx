@@ -77,7 +77,7 @@ export default function InteractiveMap({
     <div className="interactive-map-container">
       <div className="map-instructions">
         <i className="fas fa-mouse-pointer"></i>
-        <span>Haz clic en el mapa para seleccionar una ubicación</span>
+        <span>Click on the map to select a location</span>
       </div>
 
       <div className="map-wrapper">
@@ -103,7 +103,7 @@ export default function InteractiveMap({
       {latitude && longitude ? (
         <div className="coordinates-display">
           <div className="coordinate-item">
-            <strong>Latitud:</strong> {latitude.toFixed(6)}
+            <strong>Latitude:</strong> {latitude.toFixed(6)}
           </div>
           <div className="coordinate-item">
             <strong>Longitud:</strong> {longitude.toFixed(6)}
@@ -111,7 +111,7 @@ export default function InteractiveMap({
         </div>
       ) : (
         <div className="coordinates-placeholder">
-          <strong>Selecciona una ubicación en el mapa</strong>
+          <strong>Select a location on the map</strong>
         </div>
       )}
     </div>

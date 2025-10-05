@@ -105,8 +105,14 @@ export default function WeatherDetail({ weatherData, location, targetDate, onBac
       'Feels Like (°C)'
     ])
 
-    // Datos históricos
-    weatherData.historicalData.forEach(record => {
+    // Datos históricos - ordenados por año descendente
+    const sortedHistoricalData = [...weatherData.historicalData].sort((a, b) => {
+      const yearA = parseInt(a.date.split('-')[0])
+      const yearB = parseInt(b.date.split('-')[0])
+      return yearB - yearA // Ordenar descendente (más reciente primero)
+    })
+
+    sortedHistoricalData.forEach(record => {
       excelData.push([
         record.date,
         parseFloat(record.temperatureC.toFixed(1)),
@@ -241,11 +247,7 @@ export default function WeatherDetail({ weatherData, location, targetDate, onBac
 
   const tempStats = calculateTempStats()
 
-  const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 80) return '#28a745'
-    if (confidence >= 60) return '#ffc107'
-    return '#dc3545'
-  }
+
 
   const getConfidenceLabel = (confidence: number) => {
     if (confidence >= 80) return 'High'
@@ -461,17 +463,30 @@ export default function WeatherDetail({ weatherData, location, targetDate, onBac
                 <div className="weather-stat-icon" style={{ '--icon-index': 4 } as React.CSSProperties}>
                   <i className="fas fa-wind"></i>
                 </div>
-                <div className="weather-stat-label">Wind</div>
+                <div className="weather-stat-label">Wind Speed</div>
                 <div className="weather-stat-value">
                   {weatherData.prediction.windSpeed.toFixed(1)} m/s
                 </div>
                 <div className="stat-range">
-                  Dirección: {weatherData.prediction.windCompass} ({weatherData.prediction.windDirection}°)
+                  {(weatherData.prediction.windSpeed * 3.6).toFixed(1)} km/h
                 </div>
               </div>
 
               <div className="weather-stat-card prediction-stat" style={{ '--card-index': 5 } as React.CSSProperties}>
                 <div className="weather-stat-icon" style={{ '--icon-index': 5 } as React.CSSProperties}>
+                  <i className="fas fa-compass" style={{ color: '#5f9ea0' }}></i>
+                </div>
+                <div className="weather-stat-label">Wind Direction</div>
+                <div className="weather-stat-value">
+                  {weatherData.prediction.windCompass}
+                </div>
+                <div className="stat-range">
+                  {weatherData.prediction.windDirection.toFixed(0)}°
+                </div>
+              </div>
+
+              <div className="weather-stat-card prediction-stat" style={{ '--card-index': 6 } as React.CSSProperties}>
+                <div className="weather-stat-icon" style={{ '--icon-index': 6 } as React.CSSProperties}>
                   <i className="fas fa-gauge"></i>
                 </div>
                 <div className="weather-stat-label">Atmospheric Pressure</div>
@@ -480,8 +495,8 @@ export default function WeatherDetail({ weatherData, location, targetDate, onBac
                 </div>
               </div>
 
-              <div className="weather-stat-card prediction-stat" style={{ '--card-index': 6 } as React.CSSProperties}>
-                <div className="weather-stat-icon" style={{ '--icon-index': 6 } as React.CSSProperties}>
+              <div className="weather-stat-card prediction-stat" style={{ '--card-index': 7 } as React.CSSProperties}>
+                <div className="weather-stat-icon" style={{ '--icon-index': 7 } as React.CSSProperties}>
                   <i className="fas fa-cloud"></i>
                 </div>
                 <div className="weather-stat-label">Cloud Cover</div>
@@ -490,8 +505,8 @@ export default function WeatherDetail({ weatherData, location, targetDate, onBac
                 </div>
               </div>
 
-              <div className="weather-stat-card prediction-stat" style={{ '--card-index': 7 } as React.CSSProperties}>
-                <div className="weather-stat-icon" style={{ '--icon-index': 7 } as React.CSSProperties}>
+              <div className="weather-stat-card prediction-stat" style={{ '--card-index': 8 } as React.CSSProperties}>
+                <div className="weather-stat-icon" style={{ '--icon-index': 8 } as React.CSSProperties}>
                   <i className="fas fa-sun"></i>
                 </div>
                 <div className="weather-stat-label">UV Index</div>
@@ -506,8 +521,8 @@ export default function WeatherDetail({ weatherData, location, targetDate, onBac
                 </div>
               </div>
 
-              <div className="weather-stat-card prediction-stat">
-                <div className="weather-stat-icon">
+              <div className="weather-stat-card prediction-stat" style={{ '--card-index': 9 } as React.CSSProperties}>
+                <div className="weather-stat-icon" style={{ '--icon-index': 9 } as React.CSSProperties}>
                   <i className="fas fa-cloud-rain"></i>
                 </div>
                 <div className="weather-stat-label">Precipitation</div>
@@ -516,6 +531,32 @@ export default function WeatherDetail({ weatherData, location, targetDate, onBac
                 </div>
                 <div className="stat-range">
                   Total histórico: {weatherData.statistics.precipitation.total.toFixed(1)} mm
+                </div>
+              </div>
+
+              <div className="weather-stat-card prediction-stat" style={{ '--card-index': 10 } as React.CSSProperties}>
+                <div className="weather-stat-icon" style={{ '--icon-index': 10 } as React.CSSProperties}>
+                  <i className="fas fa-temperature-three-quarters" style={{ color: '#ff8c42' }}></i>
+                </div>
+                <div className="weather-stat-label">Feels Like</div>
+                <div className="weather-stat-value">
+                  {weatherData.prediction.feelsLike.toFixed(1)} °C
+                </div>
+                <div style={{ fontSize: '0.85rem', color: '#6c757d', marginTop: '0.25rem' }}>
+                  {tempF(weatherData.prediction.feelsLike)} °F
+                </div>
+              </div>
+
+              <div className="weather-stat-card prediction-stat" style={{ '--card-index': 11 } as React.CSSProperties}>
+                <div className="weather-stat-icon" style={{ '--icon-index': 11 } as React.CSSProperties}>
+                  <i className="fas fa-fire" style={{ color: '#ff4757' }}></i>
+                </div>
+                <div className="weather-stat-label">Heat Index</div>
+                <div className="weather-stat-value">
+                  {weatherData.prediction.heatIndex.toFixed(1)} °C
+                </div>
+                <div style={{ fontSize: '0.85rem', color: '#6c757d', marginTop: '0.25rem' }}>
+                  {tempF(weatherData.prediction.heatIndex)} °F
                 </div>
               </div>
             </div>
@@ -589,13 +630,23 @@ export default function WeatherDetail({ weatherData, location, targetDate, onBac
                       <th style={{ textAlign: 'right', '--i': 3 } as React.CSSProperties}><i className="fas fa-temperature-low"></i> Mín (°C)</th>
                       <th style={{ textAlign: 'right', '--i': 4 } as React.CSSProperties}><i className="fas fa-tint"></i> Humidity (%)</th>
                       <th style={{ textAlign: 'right', '--i': 5 } as React.CSSProperties}><i className="fas fa-wind"></i> Wind (m/s)</th>
-                      <th style={{ textAlign: 'right', '--i': 6 } as React.CSSProperties}><i className="fas fa-cloud-rain"></i> Precip (mm)</th>
-                      <th style={{ textAlign: 'right', '--i': 7 } as React.CSSProperties}><i className="fas fa-cloud"></i> Nubes (%)</th>
-                      <th style={{ textAlign: 'right', '--i': 8 } as React.CSSProperties}><i className="fas fa-sun"></i> UV</th>
+                      <th style={{ textAlign: 'right', '--i': 6 } as React.CSSProperties}><i className="fas fa-compass"></i> Dir (°)</th>
+                      <th style={{ textAlign: 'right', '--i': 7 } as React.CSSProperties}><i className="fas fa-cloud-rain"></i> Precip (mm)</th>
+                      <th style={{ textAlign: 'right', '--i': 8 } as React.CSSProperties}><i className="fas fa-cloud"></i> Clouds (%)</th>
+                      <th style={{ textAlign: 'right', '--i': 9 } as React.CSSProperties}><i className="fas fa-gauge"></i> Pressure (hPa)</th>
+                      <th style={{ textAlign: 'right', '--i': 10 } as React.CSSProperties}><i className="fas fa-droplet"></i> Dew Point (°C)</th>
+                      <th style={{ textAlign: 'right', '--i': 11 } as React.CSSProperties}><i className="fas fa-sun"></i> UV</th>
+                      <th style={{ textAlign: 'right', '--i': 12 } as React.CSSProperties}><i className="fas fa-temperature-three-quarters"></i> Feels Like (°C)</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {weatherData.historicalData.map((data, index) => {
+                    {[...weatherData.historicalData]
+                      .sort((a, b) => {
+                        const yearA = parseInt(a.date.split('-')[0])
+                        const yearB = parseInt(b.date.split('-')[0])
+                        return yearB - yearA // Ordenar descendente (más reciente primero)
+                      })
+                      .map((data, index) => {
                       const year = data.date.split('-')[0]
                       const formatHour = (hour?: number) => {
                         if (hour === undefined || hour === null) return ''
@@ -616,9 +667,13 @@ export default function WeatherDetail({ weatherData, location, targetDate, onBac
                           </td>
                           <td style={{ textAlign: 'right' }}>{(data.humidity ?? 0).toFixed(1)}%</td>
                           <td style={{ textAlign: 'right' }}>{(data.windSpeed ?? 0).toFixed(1)} m/s</td>
+                          <td style={{ textAlign: 'right' }}>{(data.windDirection ?? 0).toFixed(0)}°</td>
                           <td style={{ textAlign: 'right' }}>{(data.precipitation ?? 0).toFixed(1)} mm</td>
                           <td style={{ textAlign: 'right' }}>{(data.cloudCover ?? 0).toFixed(1)}%</td>
+                          <td style={{ textAlign: 'right' }}>{(data.pressure ?? 0).toFixed(1)} hPa</td>
+                          <td style={{ textAlign: 'right' }}>{(data.dewPoint ?? 0).toFixed(1)}°C</td>
                           <td style={{ textAlign: 'right' }}>{(data.uvIndex ?? 0).toFixed(1)}</td>
+                          <td style={{ textAlign: 'right' }}>{(data.feelsLike ?? 0).toFixed(1)}°C</td>
                         </tr>
                       )
                     })}
@@ -631,7 +686,7 @@ export default function WeatherDetail({ weatherData, location, targetDate, onBac
             <div className="weather-section" style={{ '--section-index': 2 } as React.CSSProperties}>
               <h3 className="weather-section-title">
                 <i className="fas fa-chart-line"></i>
-                Estadísticas del Análisis
+                Analysis statistics
               </h3>
               <div className="weather-stats-grid">
                 {tempStats && (
