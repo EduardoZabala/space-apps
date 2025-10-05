@@ -1,0 +1,19 @@
+/* En WeatherDetail.module.css */
+.tablaCompacta th,
+.tablaCompacta td {
+  padding: 0.3rem 0.5rem;
+}
+
+/* Estilo para el fondo del encabezado */
+.headerColorido thead {
+  /* Fondo con un degradado azul, similar al de Bootstrap */
+  background: linear-gradient(180deg, #1e90ff, #007bff);
+}
+
+/* Estilo para el texto y los bordes de los títulos */
+.headerColorido th {
+  color: #ffffff; /* Letra en color blanco para un mejor contraste */
+  font-weight: 600; /* Un poco más de grosor a la letra */
+  border-color: #0056b3; /* Un borde sutil que combine con el fondo */
+  vertical-align: middle;
+}

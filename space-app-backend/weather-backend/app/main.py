@@ -13,6 +13,7 @@ from .schemas import (
 from .predictor import predict_for_point
 from .providers.mock_provider import MockProvider
 from .providers.opendap_provider import OpendapProvider
+from .geocoding import geocoding_service
 
 load_dotenv()
 

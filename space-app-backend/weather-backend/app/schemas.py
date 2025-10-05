@@ -45,6 +45,10 @@ class LocationOut(BaseModel):
     latitude: float
     longitude: float
     name: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    country: Optional[str] = None
+    formatted_address: Optional[str] = None
 
 class PredictionOut(BaseModel):
     """Datos de la predicción generada"""
