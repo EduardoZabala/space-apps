@@ -7,3 +7,4 @@ pandas==2.2.3
 xarray==2024.9.0
 netCDF4==1.7.2
 requests==2.32.3
+pydap==3.4.0

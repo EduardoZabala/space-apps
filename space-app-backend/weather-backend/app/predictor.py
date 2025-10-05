@@ -3,140 +3,214 @@ Lógica de predicción meteorológica basada en análisis estadístico de datos 
 """
 import numpy as np
 import pandas as pd
+from datetime import datetime
 from typing import Tuple, List, Dict, Any
-from .providers.base import WeatherDataProvider
-from .utils import (
-    wind_deg_to_compass,
-    describe_conditions,
-    describe_precipitation,
-    describe_visibility
-)
+from app.utils import wind_deg_to_compass, calculate_heat_index, describe_conditions
+from app.providers.base import WeatherDataProvider
+import logging
+
+logger = logging.getLogger(__name__)
+
+def determine_weather_type(temp: float, humidity: float, precip: float, cloud_cover: float, wind_speed: float) -> str:
+    """
+    Determina el tipo de clima basado en las condiciones meteorológicas.
+    """
+    # Tormenta: lluvia intensa con viento fuerte
+    if precip > 10 and wind_speed > 15:
+        return "stormy"
+    
+    # Nieve: temperatura bajo cero con precipitación
+    if temp < 2 and precip > 2:
+        return "snowy"
+    
+    # Lluvia: precipitación significativa
+    if precip > 5:
+        return "rainy"
+    
+    # Niebla: humedad muy alta
+    if humidity > 90:
+        return "foggy"
+    
+    # Nublado: cobertura de nubes alta pero sin lluvia significativa
+    if cloud_cover > 60:
+        return "cloudy"
+    
+    # Soleado: poca cobertura de nubes
+    return "sunny"
 
 def predict_for_point(
-    provider: WeatherDataProvider,
-    lat: float,
-    lon: float,
-    target_date_str: str
-) -> Tuple[Dict[str, Any], List[Dict[str, Any]], str, str, int, int]:
+    latitude: float,
+    longitude: float,
+    target_date: datetime,
+    data_provider: WeatherDataProvider
+) -> dict:
     """
-    Genera predicción meteorológica para un punto y fecha específicos.
-    
-    Args:
-        provider: Proveedor de datos históricos
-        lat: Latitud
-        lon: Longitud
-        target_date_str: Fecha objetivo en formato "YYYY-MM-DD"
-        
-    Returns:
-        Tupla con:
-        - prediction: Dict con la predicción y rangos
-        - historical_rows: Lista de datos históricos
-        - trend_text: Texto de análisis de tendencias
-        - notes: Notas adicionales
-        - years_analyzed: Número de años analizados
-        - data_points: Número de puntos de datos
+    Genera una predicción meteorológica para un punto y fecha específicos
+    usando datos históricos.
     """
-    import datetime as dt
-    
-    # Parsear fecha objetivo
-    target_date = dt.date.fromisoformat(target_date_str)
-    target_month = target_date.month
-    target_day = target_date.day
-    
-    # Obtener datos históricos (20 años para datos reales de NASA)
-    df = provider.fetch_historical_data(
-        lat=lat,
-        lon=lon,
-        target_month=target_month,
-        target_day=target_day,
-        years_back=20
+    # Obtener datos históricos del proveedor con descarga paralela (10 años)
+    historical_data = data_provider.fetch_historical_data(
+        lat=latitude,
+        lon=longitude,
+        target_month=target_date.month,
+        target_day=target_date.day,
+        years_back=10  # Aumentado a 10 años con descarga paralela y caché
     )
     
-    if df.empty:
-        raise ValueError("No se encontraron datos históricos para esta ubicación")
+    if historical_data.empty:
+        raise ValueError("No se pudieron obtener datos históricos")
     
-    # Estadísticas de temperatura
-    t_mean = df["temperatureC"].mean()
-    t_std = df["temperatureC"].std()
-    t_min = df["temperatureC"].min()
-    t_max = df["temperatureC"].max()
+    df = historical_data
     
-    # Estadísticas de humedad
-    h_mean = df["humidity"].mean()
-    h_std = df["humidity"].std()
-    h_min = df["humidity"].min()
-    h_max = df["humidity"].max()
-    
-    # Estadísticas de viento
-    w_mean = df["windSpeed"].mean()
-    w_std = df["windSpeed"].std()
-    w_min = df["windSpeed"].min()
-    w_max = df["windSpeed"].max()
-    
-    # Dirección de viento predominante
-    wind_dir = df["windDirection"].mean()
-    
-    # Precipitación
-    precip_mean = df["precipitation"].mean() if "precipitation" in df.columns else 0
-    precip_max = df["precipitation"].max() if "precipitation" in df.columns else 0
-    
-    # Calcular confianza basada en:
-    # 1. Cantidad de datos
-    # 2. Consistencia (menor desviación estándar = mayor confianza)
-    data_quality = min(len(df) / 10, 1.0)  # Máximo con 10 años
-    temp_consistency = max(0, 1 - (t_std / 10))  # Penalizar alta variabilidad
-    humidity_consistency = max(0, 1 - (h_std / 20))
-    
-    confidence = round((data_quality * 0.4 + temp_consistency * 0.3 + humidity_consistency * 0.3) * 100, 1)
-    
-    # Generar descripciones textuales
-    cond_text = describe_conditions(t_mean, h_mean, precip_mean)
-    precip_text = describe_precipitation(precip_mean, precip_max)
-    vis_text = describe_visibility(h_mean, precip_mean)
-    
-    # Crear respuesta de predicción
-    response = {
-        "temperatureC": round(t_mean, 1),
-        "temperatureMin": round(t_min, 1),
-        "temperatureMax": round(t_max, 1),
-        "humidity": round(h_mean, 1),
-        "humidityMin": round(h_min, 1),
-        "humidityMax": round(h_max, 1),
-        "windSpeed": round(w_mean, 1),
-        "windSpeedMin": round(w_min, 1),
-        "windSpeedMax": round(w_max, 1),
-        "windDirection": wind_deg_to_compass(wind_dir),
-        "conditions": cond_text,
-        "precipitation": precip_text,
-        "visibility": vis_text,
-        "confidence": confidence
+    # Análisis estadístico
+    stats = {
+        "temperature": {
+            "mean": df["temperatureC"].mean(),
+            "std": df["temperatureC"].std(),
+            "min": df["temperatureC"].min(),
+            "max": df["temperatureC"].max()
+        },
+        "humidity": {
+            "mean": df["humidity"].mean(),
+            "std": df["humidity"].std(),
+            "min": df["humidity"].min(),
+            "max": df["humidity"].max()
+        },
+        "wind_speed": {
+            "mean": df["windSpeed"].mean(),
+            "std": df["windSpeed"].std(),
+            "min": df["windSpeed"].min(),
+            "max": df["windSpeed"].max()
+        },
+        "precipitation": {
+            "mean": df["precipitation"].mean(),
+            "std": df["precipitation"].std(),
+            "total": df["precipitation"].sum()
+        },
+        "cloud_cover": {
+            "mean": df["cloudCover"].mean(),
+            "std": df["cloudCover"].std()
+        },
+        "pressure": {
+            "mean": df["pressure"].mean(),
+            "std": df["pressure"].std()
+        },
+        "dew_point": {
+            "mean": df["dewPoint"].mean(),
+            "std": df["dewPoint"].std()
+        },
+        "uv_index": {
+            "mean": df["uvIndex"].mean(),
+            "std": df["uvIndex"].std()
+        },
+        "feels_like": {
+            "mean": df["feelsLike"].mean(),
+            "std": df["feelsLike"].std()
+        }
     }
     
-    # Convertir datos históricos a formato de respuesta
-    historical_rows = []
+    # Predicción (media con variación aleatoria pequeña)
+    predicted_temp = stats["temperature"]["mean"] + np.random.normal(0, stats["temperature"]["std"] * 0.3)
+    predicted_humidity = stats["humidity"]["mean"] + np.random.normal(0, stats["humidity"]["std"] * 0.3)
+    predicted_wind_speed = stats["wind_speed"]["mean"] + np.random.normal(0, stats["wind_speed"]["std"] * 0.3)
+    predicted_wind_dir = df["windDirection"].mean()
+    predicted_precip = max(0, stats["precipitation"]["mean"] + np.random.normal(0, stats["precipitation"]["std"] * 0.5))
+    predicted_cloud_cover = stats["cloud_cover"]["mean"] + np.random.normal(0, stats["cloud_cover"]["std"] * 0.3)
+    predicted_pressure = stats["pressure"]["mean"] + np.random.normal(0, stats["pressure"]["std"] * 0.3)
+    predicted_dew_point = stats["dew_point"]["mean"] + np.random.normal(0, stats["dew_point"]["std"] * 0.3)
+    predicted_uv_index = stats["uv_index"]["mean"] + np.random.normal(0, stats["uv_index"]["std"] * 0.3)
+    predicted_feels_like = stats["feels_like"]["mean"] + np.random.normal(0, stats["feels_like"]["std"] * 0.3)
+    
+    # Asegurar rangos válidos
+    predicted_temp = max(-50, min(60, predicted_temp))
+    predicted_humidity = max(0, min(100, predicted_humidity))
+    predicted_wind_speed = max(0, min(50, predicted_wind_speed))
+    predicted_wind_dir = predicted_wind_dir % 360
+    predicted_cloud_cover = max(0, min(100, predicted_cloud_cover))
+    predicted_pressure = max(950, min(1050, predicted_pressure))
+    predicted_uv_index = max(0, min(11, predicted_uv_index))
+    
+    # Determinar tipo de clima
+    weather_type = determine_weather_type(
+        predicted_temp,
+        predicted_humidity,
+        predicted_precip,
+        predicted_cloud_cover,
+        predicted_wind_speed
+    )
+    
+    # Calcular probabilidades de lluvia y nieve
+    rain_probability = min(100, (predicted_humidity - 30) * 1.5 + (predicted_precip * 10))
+    rain_probability = max(0, rain_probability)
+    
+    snow_probability = 0
+    if predicted_temp < 5:
+        snow_probability = rain_probability * (5 - predicted_temp) / 5
+        rain_probability -= snow_probability
+    
+    # Calcular índice de calor
+    heat_index = calculate_heat_index(predicted_temp, predicted_humidity)
+    
+    # Calcular nivel de confianza basado en desviación estándar
+    temp_confidence = max(0, 100 - (stats["temperature"]["std"] * 3))
+    humid_confidence = max(0, 100 - (stats["humidity"]["std"] * 2))
+    confidence_score = (temp_confidence + humid_confidence) / 2
+    
+    # Convertir datos históricos a lista de diccionarios con formato de fecha
+    historical_records = []
     for _, row in df.iterrows():
-        historical_rows.append({
-            "year": int(row["year"]),
-            "temperatureC": round(row["temperatureC"], 1),
-            "humidity": round(row["humidity"], 1),
-            "windSpeed": round(row["windSpeed"], 1),
-            "conditions": describe_conditions(
-                row["temperatureC"],
-                row["humidity"],
-                row.get("precipitation", 0)
-            )
-        })
+        # Crear fecha formateada (año-mes-día)
+        date_str = f"{int(row['year'])}-{target_date.month:02d}-{target_date.day:02d}"
+        
+        # Crear registro con todos los campos incluidos temp max/min y horas
+        record = {
+            "date": date_str,
+            "temperatureC": float(row["temperatureC"]),
+            "temperatureMax": float(row.get("temperatureMax", row["temperatureC"])),
+            "temperatureMin": float(row.get("temperatureMin", row["temperatureC"])),
+            "temperatureAvg": float(row.get("temperatureAvg", row["temperatureC"])),
+            "hourMax": int(row.get("hourMax", 14)),
+            "hourMin": int(row.get("hourMin", 6)),
+            "humidity": float(row["humidity"]),
+            "windSpeed": float(row["windSpeed"]),
+            "windDirection": float(row["windDirection"]),
+            "precipitation": float(row["precipitation"]),
+            "cloudCover": float(row["cloudCover"]),
+            "pressure": float(row["pressure"]),
+            "dewPoint": float(row["dewPoint"]),
+            "uvIndex": float(row["uvIndex"]),
+            "feelsLike": float(row["feelsLike"])
+        }
+        historical_records.append(record)
     
-    # Análisis de tendencias
-    years = df["year"].tolist()
-    temps = df["temperatureC"].tolist()
-    
-    trend_text = generate_trend_analysis(years, temps, t_mean, t_std, h_mean, w_mean, precip_mean)
-    
-    # Notas
-    notes = generate_notes(lat, lon, len(df), confidence)
-    
-    return response, historical_rows, trend_text, notes, len(years), len(df)
+    return {
+        "prediction": {
+            "temperatureC": round(predicted_temp, 1),
+            "humidity": round(predicted_humidity, 1),
+            "windSpeed": round(predicted_wind_speed, 1),
+            "windDirection": round(predicted_wind_dir, 1),
+            "windCompass": wind_deg_to_compass(predicted_wind_dir),
+            "precipitation": round(predicted_precip, 1),
+            "heatIndex": round(heat_index, 1),
+            "conditions": describe_conditions(predicted_temp, predicted_humidity, predicted_wind_speed),
+            "weatherType": weather_type,
+            "cloudCover": round(predicted_cloud_cover, 1),
+            "pressure": round(predicted_pressure, 1),
+            "dewPoint": round(predicted_dew_point, 1),
+            "uvIndex": round(predicted_uv_index, 1),
+            "feelsLike": round(predicted_feels_like, 1),
+            "rainProbability": round(rain_probability, 1),
+            "snowProbability": round(snow_probability, 1)
+        },
+        "confidence": round(confidence_score, 1),
+        "historicalData": historical_records,
+        "statistics": {
+            "temperature": {k: round(v, 2) for k, v in stats["temperature"].items()},
+            "humidity": {k: round(v, 2) for k, v in stats["humidity"].items()},
+            "windSpeed": {k: round(v, 2) for k, v in stats["wind_speed"].items()},
+            "precipitation": {k: round(v, 2) for k, v in stats["precipitation"].items()}
+        }
+    }
 
 
 def generate_trend_analysis(

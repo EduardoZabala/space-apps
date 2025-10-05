@@ -8,10 +8,7 @@ from dotenv import load_dotenv
 from .schemas import (
     PredictionRequest,
     PredictionResponse,
-    LocationOut,
-    PredictionOut,
-    AnalysisOut,
-    HistoricalRow
+    StatisticsOut
 )
 from .predictor import predict_for_point
 from .providers.mock_provider import MockProvider
@@ -91,33 +88,20 @@ async def predict_weather(request: PredictionRequest):
     Retorna predicción basada en análisis de datos históricos.
     """
     try:
-        # Llamar al predictor
-        prediction_data, historical_rows, trend_text, notes, years_analyzed, data_points = predict_for_point(
-            provider=data_provider,
-            lat=request.latitude,
-            lon=request.longitude,
-            target_date_str=request.targetDate
+        # Parsear la fecha
+        from datetime import datetime
+        target_date = datetime.strptime(request.targetDate, "%Y-%m-%d")
+        
+        # Llamar al predictor con la nueva firma
+        result = predict_for_point(
+            latitude=request.latitude,
+            longitude=request.longitude,
+            target_date=target_date,
+            data_provider=data_provider
         )
         
-        # Construir respuesta
-        response = PredictionResponse(
-            targetDate=request.targetDate,
-            location=LocationOut(
-                latitude=request.latitude,
-                longitude=request.longitude,
-                name=f"Lat: {request.latitude:.2f}, Lon: {request.longitude:.2f}"
-            ),
-            prediction=PredictionOut(**prediction_data),
-            historicalData=[HistoricalRow(**row) for row in historical_rows],
-            analysis=AnalysisOut(
-                yearsAnalyzed=years_analyzed,
-                dataPoints=data_points,
-                trends=trend_text,
-                notes=notes
-            )
-        )
-        
-        return response
+        # El resultado ya viene con la estructura correcta
+        return result
         
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

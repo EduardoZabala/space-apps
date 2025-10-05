@@ -4,6 +4,7 @@ Genera datos basados en patrones meteorológicos reales y ubicación geográfica
 """
 import numpy as np
 import pandas as pd
+from datetime import datetime
 from .base import WeatherDataProvider
 
 class MockProvider(WeatherDataProvider):
@@ -34,7 +35,7 @@ class MockProvider(WeatherDataProvider):
         # Semilla basada en ubicación para consistencia
         np.random.seed(int(abs(lat * 1000 + lon * 100 + target_month * 10 + target_day)))
         
-        current_year = 2024
+        current_year = datetime.now().year
         years = list(range(current_year - years_back, current_year))
         
         # Determinar hemisferio para ajustar estaciones
@@ -106,13 +107,46 @@ class MockProvider(WeatherDataProvider):
                 
             precipitation = max(0, np.random.exponential(precip_rate))
             
+            # Nuevas variables climáticas
+            # Cobertura de nubes (correlacionada con humedad)
+            cloud_cover = min(100, max(0, humidity * 0.8 + np.random.normal(0, 15)))
+            
+            # Presión atmosférica (varía con altitud y clima)
+            # Presión base a nivel del mar: ~1013 hPa
+            altitude_effect = abs_lat * 0.5  # Simplificación
+            pressure = 1013 - altitude_effect + np.random.normal(0, 10)
+            
+            # Punto de rocío (relacionado con temperatura y humedad)
+            dew_point = temp - ((100 - humidity) / 5)
+            
+            # Índice UV (mayor cerca del ecuador, en verano, con cielo despejado)
+            uv_base = 11 - (abs_lat / 9)  # Más alto cerca del ecuador
+            uv_seasonal = seasonal_factor * 2  # Más alto en verano
+            uv_cloud_reduction = (cloud_cover / 100) * 5  # Nubes reducen UV
+            uv_index = max(0, min(11, uv_base + uv_seasonal - uv_cloud_reduction))
+            
+            # Sensación térmica (wind chill o heat index)
+            if temp < 10 and wind_speed > 5:
+                # Wind chill
+                feels_like = temp - (wind_speed * 0.5)
+            elif temp > 27 and humidity > 40:
+                # Heat index simplificado
+                feels_like = temp + (humidity - 40) * 0.2
+            else:
+                feels_like = temp
+            
             data.append({
                 "year": year,
                 "temperatureC": round(temp, 1),
                 "humidity": round(humidity, 1),
                 "windSpeed": round(wind_speed, 1),
                 "windDirection": round(wind_dir, 1),
-                "precipitation": round(precipitation, 1)
+                "precipitation": round(precipitation, 1),
+                "cloudCover": round(cloud_cover, 1),
+                "pressure": round(pressure, 1),
+                "dewPoint": round(dew_point, 1),
+                "uvIndex": round(uv_index, 1),
+                "feelsLike": round(feels_like, 1)
             })
         
         return pd.DataFrame(data)

@@ -18,11 +18,28 @@ class PredictionRequest(BaseModel):
         return v
 
 class HistoricalRow(BaseModel):
-    year: int
+    date: str  # "YYYY-MM-DD"
     temperatureC: float
+    temperatureMax: Optional[float] = None  # Temperatura máxima del día
+    temperatureMin: Optional[float] = None  # Temperatura mínima del día
+    temperatureAvg: Optional[float] = None  # Temperatura promedio del día
+    hourMax: Optional[int] = None  # Hora de temperatura máxima (0-23)
+    hourMin: Optional[int] = None  # Hora de temperatura mínima (0-23)
     humidity: float
     windSpeed: float
-    conditions: str
+    windDirection: float
+    precipitation: float
+    cloudCover: float
+    pressure: float
+    dewPoint: float
+    uvIndex: float
+    feelsLike: float
+
+class StatisticsOut(BaseModel):
+    temperature: dict
+    humidity: dict
+    windSpeed: dict
+    precipitation: dict
 
 class LocationOut(BaseModel):
     latitude: float
@@ -30,30 +47,27 @@ class LocationOut(BaseModel):
     name: Optional[str] = None
 
 class PredictionOut(BaseModel):
+    """Datos de la predicción generada"""
     temperatureC: float
-    temperatureMin: float
-    temperatureMax: float
     humidity: float
-    humidityMin: float
-    humidityMax: float
     windSpeed: float
-    windSpeedMin: float
-    windSpeedMax: float
-    windDirection: str
+    windDirection: float
+    windCompass: str
+    precipitation: float
+    heatIndex: float
     conditions: str
-    precipitation: str
-    visibility: str
-    confidence: float  # 0-100
-
-class AnalysisOut(BaseModel):
-    yearsAnalyzed: int
-    dataPoints: int
-    trends: str
-    notes: str
+    # Nuevas variables climáticas
+    weatherType: str  # "sunny", "rainy", "snowy", "cloudy", "stormy", "foggy"
+    cloudCover: float  # Porcentaje de cobertura de nubes (0-100)
+    uvIndex: float  # Índice UV (0-11+)
+    dewPoint: float  # Punto de rocío en °C
+    pressure: float  # Presión atmosférica en hPa
+    feelsLike: float  # Sensación térmica en °C
+    rainProbability: float  # Probabilidad de lluvia (0-100)
+    snowProbability: float  # Probabilidad de nieve (0-100)
 
 class PredictionResponse(BaseModel):
-    targetDate: str
-    location: LocationOut
     prediction: PredictionOut
+    confidence: float
     historicalData: List[HistoricalRow]
-    analysis: AnalysisOut
+    statistics: StatisticsOut

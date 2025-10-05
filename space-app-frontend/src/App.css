@@ -1128,117 +1128,35 @@
 
 /* Historical Data Table */
 .historical-data-table {
+  width: 100%;
   overflow-x: auto;
-  margin-top: 1rem;
-  animation: fadeInUp 0.8s ease-out;
+  margin-top: 1.5rem;
 }
 
 .historical-data-table table {
   width: 100%;
   border-collapse: collapse;
   background: var(--white);
-  border-radius: var(--border-radius-small);
-  overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-}
-
-.historical-data-table table:hover {
-  box-shadow: 0 8px 25px rgba(0, 160, 183, 0.15);
 }
 
 .historical-data-table thead {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
-  color: var(--white);
-  position: relative;
-}
-
-.historical-data-table thead::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background: linear-gradient(90deg, var(--secondary-color), var(--accent-color), var(--secondary-color));
-  background-size: 200% 100%;
-  background-position: 0% 0%;
-  transition: background-position 3s linear;
-}
-
-.historical-data-table:hover thead::after {
-  animation: gradientSlide 3s linear infinite;
-}
-
-@keyframes gradientSlide {
-  0% { background-position: 0% 0%; }
-  100% { background-position: 200% 0%; }
+  background: var(--primary-color);
 }
 
 .historical-data-table th {
-  padding: 1rem;
+  color: var(--white);
+  padding: 0.75rem 1rem;
   text-align: left;
   font-weight: 600;
-  font-size: 0.9rem;
-  white-space: nowrap;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.historical-data-table th i {
-  margin-right: 0.5rem;
-  opacity: 0.9;
-  transition: all 0.3s ease;
-}
-
-.historical-data-table:hover th i {
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.historical-data-table tbody tr {
-  border-bottom: 1px solid var(--border-color);
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.historical-data-table tbody tr::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 0;
-  background: linear-gradient(90deg, rgba(0, 160, 183, 0.1), transparent);
-  transition: width 0.4s ease;
-}
-
-.historical-data-table tbody tr:hover::before {
-  width: 100%;
-}
-
-.historical-data-table tbody tr:hover {
-  background-color: rgba(0, 160, 183, 0.05);
-  transform: scale(1.01);
-}
-
-.historical-data-table tbody tr:last-child {
-  border-bottom: none;
 }
 
 .historical-data-table td {
-  padding: 0.875rem 1rem;
-  font-size: 0.9rem;
-  color: #495057;
-  position: relative;
-  z-index: 1;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e9ecef;
 }
 
-.historical-data-table td:first-child {
-  font-weight: 600;
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.historical-data-table tbody tr:hover {
+  background: #f8f9fa;
 }
 
 /* Readonly Badge */

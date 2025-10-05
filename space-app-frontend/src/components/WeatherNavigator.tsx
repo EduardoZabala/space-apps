@@ -10,49 +10,71 @@ interface PredictionRequest {
   targetDate: string
 }
 
-interface HistoricalData {
-  year: number
-  temperatureC: number
-  humidity: number
-  windSpeed: number
-  conditions: string
-}
-
 interface WeatherPrediction {
-  targetDate: string
-  location: {
-    latitude: number
-    longitude: number
-    name?: string
-  }
   prediction: {
     temperatureC: number
-    temperatureMin: number
-    temperatureMax: number
     humidity: number
-    humidityMin: number
-    humidityMax: number
     windSpeed: number
-    windSpeedMin: number
-    windSpeedMax: number
-    windDirection: string
+    windDirection: number
+    windCompass: string
+    precipitation: number
+    heatIndex: number
     conditions: string
-    precipitation: string
-    visibility: string
-    confidence: number
+    weatherType: string
+    cloudCover: number
+    pressure: number
+    dewPoint: number
+    uvIndex: number
+    feelsLike: number
+    rainProbability: number
+    snowProbability: number
   }
-  historicalData: HistoricalData[]
-  analysis: {
-    yearsAnalyzed: number
-    dataPoints: number
-    trends: string
-    notes: string
+  confidence: number
+  historicalData: Array<{
+    date: string
+    temperatureC: number
+    humidity: number
+    windSpeed: number
+    windDirection: number
+    precipitation: number
+    cloudCover: number
+    pressure: number
+    dewPoint: number
+    uvIndex: number
+    feelsLike: number
+  }>
+  statistics: {
+    temperature: {
+      mean: number
+      std: number
+      min: number
+      max: number
+    }
+    humidity: {
+      mean: number
+      std: number
+      min: number
+      max: number
+    }
+    windSpeed: {
+      mean: number
+      std: number
+      min: number
+      max: number
+    }
+    precipitation: {
+      mean: number
+      std: number
+      total: number
+    }
   }
 }
 
 export default function WeatherNavigator() {
   const [currentLevel, setCurrentLevel] = useState<NavigationLevel>('search')
   const [predictionData, setPredictionData] = useState<WeatherPrediction | null>(null)
+  const [locationData, setLocationData] = useState<{ name: string; latitude: number; longitude: number } | null>(null)
+  const [targetDate, setTargetDate] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -61,6 +83,54 @@ export default function WeatherNavigator() {
     setError(null)
     
     try {
+      // Obtener el nombre de la ubicación desde coordenadas usando geocodificación inversa
+      let locationName = `${request.latitude.toFixed(4)}°, ${request.longitude.toFixed(4)}°`
+      
+      try {
+        // Usar OpenStreetMap Nominatim API (gratuita, no requiere API key)
+        const geoResponse = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${request.latitude}&lon=${request.longitude}&zoom=10&addressdetails=1`,
+          {
+            headers: {
+              'User-Agent': 'WeatherPredictionApp/1.0'
+            }
+          }
+        )
+        
+        if (geoResponse.ok) {
+          const geoData = await geoResponse.json()
+          
+          // Construir nombre de ubicación jerárquico
+          const address = geoData.address || {}
+          const parts = []
+          
+          // Priorizar ciudad/pueblo
+          const cityName = address.city || address.town || address.village || address.municipality
+          if (cityName) parts.push(cityName)
+          
+          // Agregar estado/región solo si no contiene el nombre de la ciudad
+          if (address.state && cityName) {
+            // Verificar que el estado no contenga el nombre de la ciudad
+            if (!address.state.toLowerCase().includes(cityName.toLowerCase())) {
+              parts.push(address.state)
+            }
+          } else if (address.state && !cityName) {
+            // Si no hay ciudad, agregar el estado
+            parts.push(address.state)
+          }
+          
+          // Agregar país
+          if (address.country) parts.push(address.country)
+          
+          if (parts.length > 0) {
+            locationName = parts.join(', ')
+          }
+        }
+      } catch (geoError) {
+        console.warn('No se pudo obtener el nombre de la ubicación:', geoError)
+        // Continuar con las coordenadas como fallback
+      }
+      
       // Llamada al backend real
       const response = await fetch('http://localhost:8000/api/weather/predict', {
         method: 'POST',
@@ -75,6 +145,12 @@ export default function WeatherNavigator() {
       
       const data: WeatherPrediction = await response.json()
       setPredictionData(data)
+      setLocationData({
+        name: locationName,
+        latitude: request.latitude,
+        longitude: request.longitude
+      })
+      setTargetDate(request.targetDate)
       setCurrentLevel('result')
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al obtener la predicción'
@@ -85,57 +161,11 @@ export default function WeatherNavigator() {
     }
   }
 
-  const handleExportExcel = () => {
-    if (!predictionData) return
-    
-    // TODO: Implementar exportación real a Excel
-    // Por ahora, creamos un CSV básico que se puede abrir en Excel
-    const csvContent = generateCSV(predictionData)
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const link = document.createElement('a')
-    const url = URL.createObjectURL(blob)
-    link.setAttribute('href', url)
-    link.setAttribute('download', `prediccion_meteorologica_${predictionData.targetDate}.csv`)
-    link.style.visibility = 'hidden'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
-
-  const generateCSV = (data: WeatherPrediction): string => {
-    let csv = 'PREDICCIÓN METEOROLÓGICA\n\n'
-    csv += `Fecha Objetivo,${data.targetDate}\n`
-    csv += `Ubicación,"Lat: ${data.location.latitude} Lon: ${data.location.longitude}"\n`
-    csv += `Confianza,${data.prediction.confidence}%\n\n`
-    
-    csv += 'PREDICCIÓN\n'
-    csv += 'Variable,Valor,Mínimo,Máximo\n'
-    csv += `Temperatura (°C),${data.prediction.temperatureC},${data.prediction.temperatureMin},${data.prediction.temperatureMax}\n`
-    csv += `Humedad (%),${data.prediction.humidity},${data.prediction.humidityMin},${data.prediction.humidityMax}\n`
-    csv += `Viento (m/s),${data.prediction.windSpeed},${data.prediction.windSpeedMin},${data.prediction.windSpeedMax}\n`
-    csv += `Dirección del Viento,${data.prediction.windDirection},,\n`
-    csv += `Condiciones,${data.prediction.conditions},,\n`
-    csv += `Precipitación,${data.prediction.precipitation},,\n`
-    csv += `Visibilidad,${data.prediction.visibility},,\n\n`
-    
-    csv += 'DATOS HISTÓRICOS\n'
-    csv += 'Año,Temperatura (°C),Humedad (%),Viento (m/s),Condiciones\n'
-    data.historicalData.forEach(h => {
-      csv += `${h.year},${h.temperatureC},${h.humidity},${h.windSpeed},${h.conditions}\n`
-    })
-    
-    csv += '\nANÁLISIS\n'
-    csv += `Años Analizados,${data.analysis.yearsAnalyzed}\n`
-    csv += `Puntos de Datos,${data.analysis.dataPoints}\n`
-    csv += `Tendencias,"${data.analysis.trends}"\n`
-    csv += `Notas,"${data.analysis.notes}"\n`
-    
-    return csv
-  }
-
   const handleBackToSearch = () => {
     setCurrentLevel('search')
     setPredictionData(null)
+    setLocationData(null)
+    setTargetDate('')
     setError(null)
   }
 
@@ -171,11 +201,12 @@ export default function WeatherNavigator() {
         </>
       )}
       
-      {currentLevel === 'result' && predictionData && (
+      {currentLevel === 'result' && predictionData && locationData && targetDate && (
         <WeatherDetail 
           weatherData={predictionData}
+          location={locationData}
+          targetDate={targetDate}
           onBack={handleBackToSearch}
-          onExportExcel={handleExportExcel}
         />
       )}
     </>
