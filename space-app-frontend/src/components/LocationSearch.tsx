@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import InteractiveMap from './InteractiveMap'
 
 interface PredictionRequest {
   latitude: number
@@ -12,8 +13,8 @@ interface LocationSearchProps {
 }
 
 export default function LocationSearch({ onSearch, disabled = false }: LocationSearchProps) {
-  const [latitude, setLatitudee] = useState('')
-  const [longitude, setLongitudee] = useState('')
+  const [latitude, setLatitude] = useState<number>(0)
+  const [longitude, setLongitude] = useState<number>(0)
   const [targetDate, setTargetDate] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -24,6 +25,20 @@ export default function LocationSearch({ onSearch, disabled = false }: LocationS
     return tomorrow.toISOString().split('T')[0]
   }
 
+  const handleLocationChange = (lat: number, lng: number) => {
+    const normalizeLng = (longitude: number): number => {
+      while (longitude > 180) longitude -= 360
+      while (longitude <= -180) longitude += 360
+      return parseFloat(longitude.toFixed(6))
+    }
+    
+    const clampedLat = parseFloat(Math.max(-90, Math.min(90, lat)).toFixed(6))
+    const normalizedLng = normalizeLng(lng)
+    
+    setLatitude(clampedLat)
+    setLongitude(normalizedLng)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -32,8 +47,8 @@ export default function LocationSearch({ onSearch, disabled = false }: LocationS
       return
     }
 
-    const lat = parseFloat(latitude)
-    const lon = parseFloat(longitude)
+    const lat = latitude
+    const lon = longitude
 
     if (isNaN(lat) || isNaN(lon)) {
       alert('Coordinates must be valid numbers')
@@ -62,8 +77,8 @@ export default function LocationSearch({ onSearch, disabled = false }: LocationS
     setIsLoading(true)
     try {
       await onSearch({
-        latitude: lat,
-        longitude: lon,
+        latitude,
+        longitude,
         targetDate
       })
     } finally {
@@ -99,43 +114,13 @@ export default function LocationSearch({ onSearch, disabled = false }: LocationS
             <div className="search-section">
               <h3 className="search-section-title">
                 <i className="fas fa-map-marked-alt"></i>
-                Location (Geographic Coordinates)
+                Select a Geographic position
               </h3>
-              <div className="search-form-grid">
-                <div className="weather-form-field">
-                  <label className="weather-form-label">
-                    <i className="fas fa-globe-americas"></i>
-                    Latitude
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    className="weather-form-input"
-                    value={latitude}
-                    onChange={(e) => setLatitudee(e.target.value)}
-                    placeholder="Ej: 4.60971"
-                    required
-                  />
-                  <small className="form-hint">Range: -90 a 90</small>
-                </div>
-
-                <div className="weather-form-field">
-                  <label className="weather-form-label">
-                    <i className="fas fa-globe-americas"></i>
-                    Longitude
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    className="weather-form-input"
-                    value={longitude}
-                    onChange={(e) => setLongitudee(e.target.value)}
-                    placeholder="Ej: -74.08175"
-                    required
-                  />
-                  <small className="form-hint">Range: -180 a 180</small>
-                </div>
-              </div>
+              <InteractiveMap
+                latitude={latitude}
+                longitude={longitude}
+                onLocationChange={handleLocationChange}
+              />
             </div>
 
             <div className="search-section">

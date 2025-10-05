@@ -1309,3 +1309,115 @@
 .error-container .weather-btn {
   margin-top: 1rem;
 }
+
+/* =========================
+   INTERACTIVE MAP STYLES
+   ========================= */
+.interactive-map-container {
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.map-instructions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+  border-radius: var(--border-radius-small);
+  border: 1px solid var(--border-color);
+  font-size: 0.95rem;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.map-instructions i {
+  color: var(--secondary-color);
+  font-size: 1.1rem;
+}
+
+.map-wrapper {
+  border-radius: var(--border-radius-small);
+  overflow: hidden;
+  box-shadow: var(--shadow-medium);
+  border: 2px solid var(--border-color);
+  position: relative;
+  z-index: 1;
+}
+
+.map-wrapper .leaflet-container {
+  border-radius: var(--border-radius-small);
+  font-family: inherit;
+}
+
+.coordinates-display {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: var(--border-radius-small);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-light);
+}
+
+.coordinate-item {
+  flex: 1;
+  text-align: center;
+  padding: 0.5rem;
+  background: var(--white);
+  border-radius: var(--border-radius-small);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  font-size: 0.9rem;
+}
+
+.coordinate-item strong {
+  color: var(--primary-color);
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.map-info {
+  text-align: center;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(0, 160, 183, 0.1);
+  border-radius: var(--border-radius-small);
+  border: 1px solid rgba(0, 160, 183, 0.2);
+}
+
+/* Responsive map styles */
+@media (max-width: 768px) {
+  .map-wrapper {
+    margin: 0 -1rem;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+  }
+  
+  .map-wrapper .leaflet-container {
+    border-radius: 0;
+  }
+  
+  .coordinates-display {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Leaflet marker popup customization */
+.leaflet-popup-content-wrapper {
+  border-radius: var(--border-radius-small) !important;
+  box-shadow: var(--shadow-medium) !important;
+}
+
+.leaflet-popup-content {
+  font-family: inherit !important;
+  color: var(--primary-color) !important;
+}
