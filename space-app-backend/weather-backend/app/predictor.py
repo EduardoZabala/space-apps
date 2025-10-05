@@ -49,13 +49,13 @@ def predict_for_point(
     Genera una predicción meteorológica para un punto y fecha específicos
     usando datos históricos.
     """
-    # Obtener datos históricos del proveedor con descarga paralela (10 años)
+    # Obtener datos históricos del proveedor con descarga paralela (14 años)
     historical_data = data_provider.fetch_historical_data(
         lat=latitude,
         lon=longitude,
         target_month=target_date.month,
         target_day=target_date.day,
-        years_back=10  # Aumentado a 10 años con descarga paralela y caché
+        years_back=14  # 14 años para mayor precisión estadística
     )
     
     if historical_data.empty:

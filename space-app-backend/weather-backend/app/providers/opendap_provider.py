@@ -146,7 +146,8 @@ class OpendapProvider(WeatherDataProvider):
             try:
                 with open(cache_file, 'r') as f:
                     cached_data = json.load(f)
-                    print(f"📦 Data obtained from cache: {cache_file.name}")
+                    # OPTIMIZACIÓN: Comentamos print para velocidad
+                    # print(f"📦 Data obtained from cache: {cache_file.name}")
                     return cached_data
             except Exception as e:
                 print(f"⚠️  Error reading cache: {e}")
@@ -169,7 +170,8 @@ class OpendapProvider(WeatherDataProvider):
         try:
             with open(cache_file, 'w') as f:
                 json.dump(data, f)
-                print(f"💾 Data saved to cache: {cache_file.name}")
+                # OPTIMIZACIÓN: Comentamos print para velocidad
+                # print(f"💾 Data saved to cache: {cache_file.name}")
         except Exception as e:
             print(f"⚠️  Error saving cache: {e}")
         
@@ -179,7 +181,7 @@ class OpendapProvider(WeatherDataProvider):
         lon: float,
         target_month: int,
         target_day: int,
-        years_back: int = 10  # 10 años de datos históricos para mejor predicción
+        years_back: int = 14  # 14 años de datos históricos para mejor predicción
     ) -> pd.DataFrame:
         """
         Obtiene datos meteorológicos reales de NASA MERRA-2 para los últimos años.
@@ -190,7 +192,7 @@ class OpendapProvider(WeatherDataProvider):
             lon: Longitud del punto
             target_month: Mes objetivo (1-12)
             target_day: Día objetivo (1-31)
-            years_back: Años hacia atrás (default: 10, con descarga paralela limitada)
+            years_back: Años hacia atrás (default: 14, con descarga paralela limitada)
             
         Returns:
             DataFrame con datos históricos reales de NASA MERRA-2
@@ -234,34 +236,45 @@ class OpendapProvider(WeatherDataProvider):
                             "feelsLike": float(cached.get("feels_like", 15.0))
                         }
                     
-                    # Obtener datos de MERRA-2 para esa fecha
-                    weather_data = self._fetch_merra2_day(lat, lon, target_date)
+                    # Obtener datos de MERRA-2 para esa fecha con reintentos
+                    max_retries = 3
+                    for attempt in range(max_retries):
+                        try:
+                            weather_data = self._fetch_merra2_day(lat, lon, target_date)
+                            if weather_data:
+                                # Guardar en caché
+                                self._save_to_cache(cache_key, weather_data)
+                                
+                                return {
+                                    "year": int(year),
+                                    "temperatureC": float(weather_data.get("temperature", 15.0)),
+                                    "temperatureMax": float(weather_data.get("temperature_max", 15.0)),
+                                    "temperatureMin": float(weather_data.get("temperature_min", 15.0)),
+                                    "temperatureAvg": float(weather_data.get("temperature_avg", 15.0)),
+                                    "hourMax": int(weather_data.get("hour_max", 14)),
+                                    "hourMin": int(weather_data.get("hour_min", 6)),
+                                    "humidity": float(weather_data.get("humidity", 60.0)),
+                                    "windSpeed": float(weather_data.get("wind_speed", 5.0)),
+                                    "windDirection": float(weather_data.get("wind_direction", 0.0)),
+                                    "precipitation": float(weather_data.get("precipitation", 0.0)),
+                                    "cloudCover": float(weather_data.get("cloud_cover", 50.0)),
+                                    "pressure": float(weather_data.get("pressure", 1013.0)),
+                                    "dewPoint": float(weather_data.get("dew_point", 10.0)),
+                                    "uvIndex": float(weather_data.get("uv_index", 5.0)),
+                                    "feelsLike": float(weather_data.get("feels_like", 15.0))
+                                }
+                            break
+                        except Exception as retry_error:
+                            if attempt < max_retries - 1:
+                                # Esperar antes de reintentar (backoff exponencial aumentado)
+                                import time
+                                wait_time = (attempt + 1) * 3  # 3s, 6s, 9s (antes 2s, 4s, 6s)
+                                print(f"⚠️  Reintentando año {year} en {wait_time}s... (intento {attempt + 2}/{max_retries})")
+                                time.sleep(wait_time)
+                            else:
+                                print(f"❌ Falló descarga de {year} después de {max_retries} intentos")
+                                raise retry_error
                     
-                    if weather_data:
-                        # Guardar en caché
-                        self._save_to_cache(cache_key, weather_data)
-                        
-                        # DEBUG: Verificar que los datos tienen temp max/min
-                        print(f"DEBUG año {year}: weather_data keys = {list(weather_data.keys())}")
-                        
-                        return {
-                            "year": int(year),
-                            "temperatureC": float(weather_data.get("temperature", 15.0)),
-                            "temperatureMax": float(weather_data.get("temperature_max", 15.0)),
-                            "temperatureMin": float(weather_data.get("temperature_min", 15.0)),
-                            "temperatureAvg": float(weather_data.get("temperature_avg", 15.0)),
-                            "hourMax": int(weather_data.get("hour_max", 14)),
-                            "hourMin": int(weather_data.get("hour_min", 6)),
-                            "humidity": float(weather_data.get("humidity", 60.0)),
-                            "windSpeed": float(weather_data.get("wind_speed", 5.0)),
-                            "windDirection": float(weather_data.get("wind_direction", 0.0)),
-                            "precipitation": float(weather_data.get("precipitation", 0.0)),
-                            "cloudCover": float(weather_data.get("cloud_cover", 50.0)),
-                            "pressure": float(weather_data.get("pressure", 1013.0)),
-                            "dewPoint": float(weather_data.get("dew_point", 10.0)),
-                            "uvIndex": float(weather_data.get("uv_index", 5.0)),
-                            "feelsLike": float(weather_data.get("feels_like", 15.0))
-                        }
                     return None
                     
                 except Exception as e:
@@ -270,19 +283,26 @@ class OpendapProvider(WeatherDataProvider):
                     return self._get_climatology_estimate(lat, lon, target_month, year)
             
             # Ejecutar descargas en paralelo con ThreadPoolExecutor
-            # Limitamos a 5 workers para evitar sobrecarga del servidor NASA (errores 503)
-            with ThreadPoolExecutor(max_workers=5) as executor:
-                # Enviar todas las tareas
-                futures = {executor.submit(fetch_year, year): year for year in years}
+            # OPTIMIZACIÓN CONSERVADORA: 7 workers para máxima estabilidad
+            # Evita errores 503 del servidor NASA que tiene límites estrictos
+            with ThreadPoolExecutor(max_workers=7) as executor:
+                # Enviar tareas con delay más largo para evitar sobrecarga
+                import time
+                futures = {}
+                for i, year in enumerate(years):
+                    futures[executor.submit(fetch_year, year)] = year
+                    if i < len(years) - 1:  # No esperar después del último
+                        time.sleep(0.2)  # 200ms entre envíos
                 
                 # Procesar resultados conforme se completan
-                for future in as_completed(futures, timeout=60):
+                # Timeout amplio para dar tiempo a reintentos (240s para 14 años)
+                for future in as_completed(futures, timeout=240):
                     year = futures[future]
                     try:
                         result = future.result()
                         if result:
                             data.append(result)
-                            print(f"✅ Año {year} completado")
+                            print(f"✅ Año {year} completado ({len(data)}/{len(years)})")
                     except Exception as e:
                         print(f"❌ Error processing {year}: {e}")
                         # Agregar estimación climatológica
@@ -319,9 +339,9 @@ class OpendapProvider(WeatherDataProvider):
             base_url = "dap4://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2"
             opendap_url = f"{base_url}/{collection}/{year}/{month:02d}/{filename}"
             
-            print(f"🌐 OPeNDAP query for {date.strftime('%Y-%m-%d')} at ({lat:.2f}, {lon:.2f})")
-          
-            print(f"   Descargando solo ~2-3 KB (punto específico)")
+            # OPTIMIZACIÓN: Solo imprimimos en modo verbose, comentamos para velocidad
+            # print(f"🌐 OPeNDAP query for {date.strftime('%Y-%m-%d')} at ({lat:.2f}, {lon:.2f})")
+            # print(f"   Descargando solo ~2-3 KB (punto específico)")
             
             # Abrir dataset remoto con pydap
             from pydap.client import open_url
@@ -329,7 +349,10 @@ class OpendapProvider(WeatherDataProvider):
             
             session = setup_session(self.username, self.password, check_url=opendap_url)
             store = xr.backends.PydapDataStore.open(opendap_url, session=session)
-            ds = xr.open_dataset(store)
+            
+            # OPTIMIZACIÓN: Usar chunks para carga lazy con dask
+            # Solo descarga los datos cuando se acceden, reduce transferencia de red
+            ds = xr.open_dataset(store, chunks={'time': 1})
             
             # DAP4 usa nombres con "/" al inicio, necesitamos renombrar las dimensiones
             # Renombrar /lat -> lat, /lon -> lon, /time -> time para compatibilidad
@@ -340,7 +363,8 @@ class OpendapProvider(WeatherDataProvider):
             
             if dim_mapping:
                 ds = ds.rename(dim_mapping)
-                print(f"📝 Dimensiones renombradas: {list(dim_mapping.keys())} -> {list(dim_mapping.values())}")
+                # OPTIMIZACIÓN: Comentamos print para velocidad
+                # print(f"📝 Dimensiones renombradas: {list(dim_mapping.keys())} -> {list(dim_mapping.values())}")
             
             # DAP4 no soporta bien sel() con method='nearest' porque las coordenadas
             # no están indexadas correctamente. Usamos selección por índices.
@@ -355,9 +379,11 @@ class OpendapProvider(WeatherDataProvider):
             lat_idx = max(0, min(360, lat_idx))  # 361 puntos (0-360)
             lon_idx = max(0, min(575, lon_idx))  # 576 puntos (0-575)
             
-            print(f"🎯 Índices calculados: lat_idx={lat_idx}, lon_idx={lon_idx}")
+            # OPTIMIZACIÓN: Comentamos print para velocidad
+            # print(f"🎯 Índices calculados: lat_idx={lat_idx}, lon_idx={lon_idx}")
             
-            # Seleccionar punto usando isel() en lugar de sel()
+            # OPTIMIZACIÓN: Seleccionar punto usando isel() directamente sin cargar todo
+            # Esto reduce drásticamente la transferencia de datos
             point = ds.isel(lat=lat_idx, lon=lon_idx)
             
             # El dataset MERRA-2 tiene múltiples mediciones por día (cada hora)
@@ -388,55 +414,47 @@ class OpendapProvider(WeatherDataProvider):
             # Usamos la máxima como temperatura principal (lo que espera el usuario)
             temp_c = temp_c_max
             
-            print(f"🌡️  TEMPERATURA ({temp_var}):")
-            print(f"    Máxima: {temp_c_max:.2f}°C a las {hour_max:02d}:00")
-            print(f"    Mínima: {temp_c_min:.2f}°C a las {hour_min:02d}:00")
-            print(f"    Promedio: {temp_c_avg:.2f}°C")
+            # OPTIMIZACIÓN: Comentamos prints para velocidad
+            # print(f"🌡️  TEMPERATURA ({temp_var}):")
+            # print(f"    Máxima: {temp_c_max:.2f}°C a las {hour_max:02d}:00")
+            # print(f"    Mínima: {temp_c_min:.2f}°C a las {hour_min:02d}:00")
+            # print(f"    Promedio: {temp_c_avg:.2f}°C")
             
             # Humedad - M2T1NXFLX puede tener QLML (specific humidity)
             if 'RH2M' in ds.data_vars:
                 humidity = float(point['RH2M'].mean().values)
-                print(f"💧 HUMEDAD: {humidity:.1f}% (RH2M)")
             elif 'QLML' in ds.data_vars:
                 qlml = float(point['QLML'].mean().values)
                 # Calcular humedad relativa desde humedad específica
                 es = 6.112 * np.exp((17.67 * temp_c) / (temp_c + 243.5))
                 e = qlml * 1013.25 / (0.622 + 0.378 * qlml)
                 humidity = min(100, max(0, (e / es) * 100))
-                print(f"💧 HUMEDAD: {humidity:.1f}% (calculada desde QLML={qlml:.6f})")
             elif 'QV2M' in ds.data_vars:
                 qv = float(point['QV2M'].mean().values)
                 # Calcular humedad relativa desde humedad específica
                 es = 6.112 * np.exp((17.67 * temp_c) / (temp_c + 243.5))
                 e = qv * 1013.25 / (0.622 + 0.378 * qv)
                 humidity = min(100, max(0, (e / es) * 100))
-                print(f"💧 HUMEDAD: {humidity:.1f}% (calculada desde QV2M={qv:.6f})")
             else:
                 humidity = 60.0
-                print(f"💧 HUMEDAD: {humidity:.1f}% (valor por defecto)")
             
             # Viento - M2T1NXFLX puede tener ULML/VLML o U10M/V10M
             u = 0
             v = 0
-            wind_var_used = None
             
             if 'U10M' in ds.data_vars and 'V10M' in ds.data_vars:
                 u = float(point['U10M'].mean().values)
                 v = float(point['V10M'].mean().values)
-                wind_var_used = 'U10M/V10M'
             elif 'ULML' in ds.data_vars and 'VLML' in ds.data_vars:
                 u = float(point['ULML'].mean().values)
                 v = float(point['VLML'].mean().values)
-                wind_var_used = 'ULML/VLML'
             else:
                 # Si no hay viento, usar valor estimado basado en la estación
                 u = 2.0
                 v = 1.0
-                wind_var_used = 'estimado'
             
             wind_speed = np.sqrt(u**2 + v**2)
             wind_direction = (np.degrees(np.arctan2(v, u)) + 360) % 360
-            print(f"💨 VIENTO ({wind_var_used}): {wind_speed:.1f} m/s, dirección {wind_direction:.0f}°")
             
             # Precipitación (M2T1NXFLX tiene PRECTOT)
             # PRECTOT está en kg/m²/s, convertir a mm/día
@@ -445,11 +463,13 @@ class OpendapProvider(WeatherDataProvider):
                 if var in ds.data_vars:
                     precip_raw = float(point[var].sum().values)
                     precip = precip_raw * 3600  # kg/m²/s * 3600 s/h = mm/día
-                    print(f"✅ Precipitación ({var}): {precip:.2f} mm/día")
+                    # OPTIMIZACIÓN: Comentamos print para velocidad
+                    # print(f"✅ Precipitación ({var}): {precip:.2f} mm/día")
                     break
             
-            if precip == 0.0:
-                print(f"⚠️  No precipitation recorded (dry day)")
+            # OPTIMIZACIÓN: Comentamos prints para velocidad
+            # if precip == 0.0:
+            #     print(f"⚠️  No precipitation recorded (dry day)")
             
             # Presión
             if 'PS' in ds.data_vars:
@@ -478,7 +498,8 @@ class OpendapProvider(WeatherDataProvider):
             seasonal_factor = np.sin(2 * np.pi * (date.month - 3) / 12)
             uv_index = max(0, uv_base * (0.7 + 0.3 * seasonal_factor) * (1 - cloud_cover / 200))
             
-            print(f"✅ Data obtained: Temp Max={temp_c_max:.1f}°C, Min={temp_c_min:.1f}°C, Humedad={humidity:.1f}%")
+            # OPTIMIZACIÓN: Comentamos print para velocidad
+            # print(f"✅ Data obtained: Temp Max={temp_c_max:.1f}°C, Min={temp_c_min:.1f}°C, Humedad={humidity:.1f}%")
             
             return {
                 "temperature": round(temp_c, 1),  # Temperatura máxima

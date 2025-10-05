@@ -93,7 +93,7 @@ export default function LocationSearch({ onSearch, disabled = false }: LocationS
           <div className="weather-header-content">
             <h1 className="weather-title">
               <i className="fas fa-crystal-ball"></i>
-              Historical Weather Prediction
+              SKYSENSE
             </h1>
           </div>
         </div>
