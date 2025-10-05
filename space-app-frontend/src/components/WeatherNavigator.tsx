@@ -127,7 +127,7 @@ export default function WeatherNavigator() {
           }
         }
       } catch (geoError) {
-        console.warn('No se pudo obtener el nombre de la ubicación:', geoError)
+        console.warn('Could not obtain location name:', geoError)
         // Continuar con las coordenadas como fallback
       }
       
@@ -153,7 +153,7 @@ export default function WeatherNavigator() {
       setTargetDate(request.targetDate)
       setCurrentLevel('result')
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error al obtener la predicción'
+      const errorMessage = err instanceof Error ? err.message : 'Error getting prediction'
       setError(errorMessage)
       console.error('Error fetching prediction:', err)
     } finally {
@@ -178,7 +178,7 @@ export default function WeatherNavigator() {
           {loading && (
             <div className="loading-container">
               <div className="loading-spinner"></div>
-              <p>Generando predicción meteorológica...</p>
+              <p>Generating weather prediction...</p>
               <small>Analizando datos históricos</small>
             </div>
           )}
@@ -188,7 +188,7 @@ export default function WeatherNavigator() {
               <div className="error-icon">
                 <i className="fas fa-exclamation-circle"></i>
               </div>
-              <h3>Error al generar predicción</h3>
+              <h3>Error generating prediction</h3>
               <p>{error}</p>
               <button 
                 className="weather-btn weather-btn-primary"

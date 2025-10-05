@@ -21,7 +21,7 @@ PROVIDER = os.getenv("DATA_PROVIDER", "mock").lower()
 
 app = FastAPI(
     title="Weather Prediction API",
-    description="API de predicción meteorológica basada en análisis de datos históricos",
+    description="Weather prediction API based on historical data analysis",
     version="1.0.0"
 )
 
@@ -37,19 +37,19 @@ app.add_middleware(
 # Selección de proveedor de datos
 if PROVIDER == "mock":
     data_provider = MockProvider()
-    print("📊 Usando MockProvider - Datos sintéticos")
+    print("📊 Using MockProvider - Synthetic data")
 elif PROVIDER == "opendap":
     earthdata_user = os.getenv("EARTHDATA_USERNAME")
     earthdata_pass = os.getenv("EARTHDATA_PASSWORD")
     
     if not earthdata_user or not earthdata_pass:
-        raise ValueError("Credenciales de NASA EarthData no configuradas en .env")
+        raise ValueError("NASA EarthData credentials not configured in .env")
     
     data_provider = OpendapProvider(earthdata_user, earthdata_pass)
-    print(f"🛰️  Usando OpendapProvider - Datos reales de NASA MERRA-2")
+    print(f"🛰️  Using OpendapProvider - Real NASA MERRA-2 data")
     print(f"👤 Usuario: {earthdata_user}")
 else:
-    raise ValueError(f"Proveedor '{PROVIDER}' no soportado. Use 'mock' o 'opendap'.")
+    raise ValueError(f"Provider '{PROVIDER}' not supported. Use 'mock' or 'opendap'.")
 
 
 @app.get("/")

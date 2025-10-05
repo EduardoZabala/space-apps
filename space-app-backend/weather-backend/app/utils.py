@@ -48,64 +48,64 @@ def calculate_heat_index(temp_c: float, humidity: float) -> float:
 
 def describe_conditions(temp: float, humidity: float, precip: float) -> str:
     """
-    Genera descripción textual de las condiciones meteorológicas.
+    Generates textual description of weather conditions.
     """
     conditions = []
     
-    # Temperatura
+    # Temperature
     if temp < 10:
-        conditions.append("Frío")
+        conditions.append("Cold")
     elif temp < 20:
-        conditions.append("Templado")
+        conditions.append("Mild")
     elif temp < 30:
-        conditions.append("Cálido")
+        conditions.append("Warm")
     else:
-        conditions.append("Caluroso")
+        conditions.append("Hot")
     
-    # Precipitación
+    # Precipitation
     if precip > 5:
-        conditions.append("lluvioso")
+        conditions.append("rainy")
     elif precip > 1:
-        conditions.append("con llovizna")
+        conditions.append("with drizzle")
     elif humidity > 80:
-        conditions.append("muy húmedo")
+        conditions.append("very humid")
     elif humidity > 60:
-        conditions.append("húmedo")
+        conditions.append("humid")
     else:
-        conditions.append("seco")
+        conditions.append("dry")
     
-    # Nubosidad (basado en humedad como proxy)
+    # Cloudiness (based on humidity as proxy)
     if humidity > 80:
-        conditions.append("nublado")
+        conditions.append("cloudy")
     elif humidity > 60:
-        conditions.append("parcialmente nublado")
+        conditions.append("partly cloudy")
     else:
-        conditions.append("despejado")
+        conditions.append("clear")
     
     return ", ".join(conditions).capitalize()
 
 def describe_precipitation(precip_mean: float, precip_max: float) -> str:
     """
-    Describe la probabilidad y cantidad de precipitación.
+    Describes precipitation probability and amount.
     """
     if precip_mean < 0.5:
-        return "Baja probabilidad (< 20%)"
+        return "Low probability (< 20%)"
     elif precip_mean < 2:
-        return "Moderada probabilidad (~40%)"
+        return "Moderate probability (~40%)"
     elif precip_mean < 5:
-        return "Alta probabilidad (~60%)"
+        return "High probability (~60%)"
     else:
-        return f"Muy alta probabilidad (~80%), precipitación esperada: {precip_mean:.1f}mm"
+        return f"Very high probability (~80%), expected precipitation: {precip_mean:.1f}mm"
 
 def describe_visibility(humidity: float, precip: float) -> str:
     """
-    Estima visibilidad basada en humedad y precipitación.
+    Estimates visibility based on humidity and precipitation.
     """
     if precip > 5:
-        return "Reducida (2-5 km)"
+        return "Reduced (2-5 km)"
     elif humidity > 90:
-        return "Moderada (5-8 km)"
+        return "Moderate (5-8 km)"
     elif humidity > 70:
-        return "Buena (8-10 km)"
+        return "Good (8-10 km)"
     else:
-        return "Excelente (> 10 km)"
+        return "Excellent (> 10 km)"

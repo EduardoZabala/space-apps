@@ -14,8 +14,8 @@ interface DaySelectorProps {
 }
 
 const MONTH_NAMES = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
 ]
 
 const DAYS_OF_WEEK = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
@@ -41,11 +41,11 @@ export default function DaySelector({ year, month, days, onSelectDay, onBack }: 
           <div className="weather-header-content">
             <button className="weather-btn weather-btn-secondary" onClick={onBack}>
               <i className="fas fa-arrow-left"></i>
-              Volver a Meses
+              Back to Months
             </button>
             <h1 className="weather-title">
               <i className="fas fa-calendar-day"></i>
-              {MONTH_NAMES[month - 1]} {year} - Selecciona un Día
+              {MONTH_NAMES[month - 1]} {year} - Select a Day
             </h1>
           </div>
         </div>
@@ -53,7 +53,7 @@ export default function DaySelector({ year, month, days, onSelectDay, onBack }: 
         <div className="cards-level-container">
           <div className="level-info">
             <i className="fas fa-layer-group"></i>
-            <span>Nivel 3: Días de {MONTH_NAMES[month - 1]} {year}</span>
+            <span>Nivel 3: Days of {MONTH_NAMES[month - 1]} {year}</span>
           </div>
 
           <div className="day-cards-grid">
@@ -97,7 +97,7 @@ export default function DaySelector({ year, month, days, onSelectDay, onBack }: 
             <div className="empty-state">
               <i className="fas fa-calendar-times"></i>
               <h3>No hay datos disponibles</h3>
-              <p>No se encontraron días con información para {MONTH_NAMES[month - 1]} {year}</p>
+              <p>No days with information found for {MONTH_NAMES[month - 1]} {year}</p>
             </div>
           )}
         </div>

@@ -25,7 +25,7 @@ export default function YearSelector({ years, onSelectYear }: YearSelectorProps)
           <div className="weather-header-content">
             <h1 className="weather-title">
               <i className="fas fa-calendar"></i>
-              Selecciona un Año
+              Selecciona un Year
             </h1>
           </div>
         </div>
@@ -33,7 +33,7 @@ export default function YearSelector({ years, onSelectYear }: YearSelectorProps)
         <div className="cards-level-container">
           <div className="level-info">
             <i className="fas fa-layer-group"></i>
-            <span>Nivel 1: Años disponibles</span>
+            <span>Nivel 1: Years disponibles</span>
           </div>
 
           <div className="year-cards-grid">
@@ -50,12 +50,12 @@ export default function YearSelector({ years, onSelectYear }: YearSelectorProps)
                   <div className="year-number">{yearData.year}</div>
                   <div className="year-info">
                     <i className="fas fa-calendar-week"></i>
-                    <span>{yearData.months.length} {yearData.months.length === 1 ? 'mes' : 'meses'}</span>
+                    <span>{yearData.months.length} {yearData.months.length === 1 ? 'month' : 'months'}</span>
                   </div>
                 </div>
                 <div className="year-card-footer">
                   <span className="card-action-text">
-                    Clic para ver meses <i className="fas fa-arrow-right"></i>
+                    Click to view months <i className="fas fa-arrow-right"></i>
                   </span>
                 </div>
               </div>
@@ -66,7 +66,7 @@ export default function YearSelector({ years, onSelectYear }: YearSelectorProps)
             <div className="empty-state">
               <i className="fas fa-calendar-times"></i>
               <h3>No hay datos disponibles</h3>
-              <p>No se encontraron años con información para el rango de fechas seleccionado</p>
+              <p>no data for the selected date range found</p>
             </div>
           )}
         </div>

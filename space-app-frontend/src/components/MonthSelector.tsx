@@ -13,8 +13,8 @@ interface MonthSelectorProps {
 }
 
 const MONTH_NAMES = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
 ]
 
 export default function MonthSelector({ year, months, onSelectMonth, onBack }: MonthSelectorProps) {
@@ -32,7 +32,7 @@ export default function MonthSelector({ year, months, onSelectMonth, onBack }: M
           <div className="weather-header-content">
             <button className="weather-btn weather-btn-secondary" onClick={onBack}>
               <i className="fas fa-arrow-left"></i>
-              Volver a Años
+              Back to Years
             </button>
             <h1 className="weather-title">
               <i className="fas fa-calendar-alt"></i>
@@ -44,7 +44,7 @@ export default function MonthSelector({ year, months, onSelectMonth, onBack }: M
         <div className="cards-level-container">
           <div className="level-info">
             <i className="fas fa-layer-group"></i>
-            <span>Nivel 2: Meses del año {year}</span>
+            <span>Level 2: Months of year {year}</span>
           </div>
 
           <div className="month-cards-grid">
@@ -62,12 +62,12 @@ export default function MonthSelector({ year, months, onSelectMonth, onBack }: M
                   <div className="month-year">{year}</div>
                   <div className="month-info">
                     <i className="fas fa-calendar-day"></i>
-                    <span>{monthData.days.length} {monthData.days.length === 1 ? 'día' : 'días'}</span>
+                    <span>{monthData.days.length} {monthData.days.length === 1 ? 'day' : 'days'}</span>
                   </div>
                 </div>
                 <div className="month-card-footer">
                   <span className="card-action-text">
-                    Clic para ver días <i className="fas fa-arrow-right"></i>
+                    Click to view days <i className="fas fa-arrow-right"></i>
                   </span>
                 </div>
               </div>
@@ -78,7 +78,7 @@ export default function MonthSelector({ year, months, onSelectMonth, onBack }: M
             <div className="empty-state">
               <i className="fas fa-calendar-times"></i>
               <h3>No hay datos disponibles</h3>
-              <p>No se encontraron meses con información para el año {year}</p>
+              <p>No months with information found for year {year}</p>
             </div>
           )}
         </div>

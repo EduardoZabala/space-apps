@@ -9,12 +9,12 @@ class PredictionRequest(BaseModel):
     @field_validator("targetDate")
     @classmethod
     def validate_date(cls, v: str) -> str:
-        # Solo valida formato básico; el front ya asegura "futura"
+        # Only validates basic format; the frontend already ensures "future"
         import datetime as dt
         try:
             dt.date.fromisoformat(v)
         except Exception:
-            raise ValueError("targetDate debe tener formato YYYY-MM-DD")
+            raise ValueError("targetDate must have format YYYY-MM-DD")
         return v
 
 class HistoricalRow(BaseModel):

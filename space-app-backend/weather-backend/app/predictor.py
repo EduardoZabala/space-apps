@@ -58,7 +58,7 @@ def predict_for_point(
     )
     
     if historical_data.empty:
-        raise ValueError("No se pudieron obtener datos históricos")
+        raise ValueError("Could not obtain historical data")
     
     df = historical_data
     
@@ -140,13 +140,29 @@ def predict_for_point(
     )
     
     # Calcular probabilidades de lluvia y nieve
-    rain_probability = min(100, (predicted_humidity - 30) * 1.5 + (predicted_precip * 10))
-    rain_probability = max(0, rain_probability)
+    # Fórmula ajustada para precipitación en mm/día
+    # Humedad contribuye hasta 70%, precipitación hasta 30%
+    humidity_factor = max(0, min(70, (predicted_humidity - 30) * 1.0))
+    
+    # Precipitación en mm/día: 0-5mm = bajo, 5-15mm = moderado, >15mm = alto
+    if predicted_precip < 5:
+        precip_factor = predicted_precip * 2  # 0-10%
+    elif predicted_precip < 15:
+        precip_factor = 10 + (predicted_precip - 5) * 1.5  # 10-25%
+    else:
+        precip_factor = min(30, 25 + (predicted_precip - 15) * 0.5)  # 25-30%
+    
+    rain_probability = min(100, max(0, humidity_factor + precip_factor))
     
     snow_probability = 0
     if predicted_temp < 5:
         snow_probability = rain_probability * (5 - predicted_temp) / 5
-        rain_probability -= snow_probability
+        rain_probability = max(0, rain_probability - snow_probability)
+        snow_probability = min(100, max(0, snow_probability))
+    
+    # Asegurar que las probabilidades estén en el rango válido [0, 100]
+    rain_probability = min(100, max(0, rain_probability))
+    snow_probability = min(100, max(0, snow_probability))
     
     # Calcular índice de calor
     heat_index = calculate_heat_index(predicted_temp, predicted_humidity)
@@ -223,31 +239,33 @@ def generate_trend_analysis(
     precip_mean: float
 ) -> str:
     """
-    Genera texto de análisis de tendencias basado en los datos históricos.
+    Generates trend analysis text based on historical data.
     """
-    # Calcular tendencia lineal simple
+    # Calculate simple linear trend
     if len(years) > 1:
         z = np.polyfit(years, temps, 1)
         trend_slope = z[0]
         
         if trend_slope > 0.1:
-            trend_desc = f"Se observa una tendencia al calentamiento de aproximadamente {abs(trend_slope):.2f}°C por año."
+            trend_desc = f"A warming trend of approximately {abs(trend_slope):.2f}°C per year is observed."
         elif trend_slope < -0.1:
-            trend_desc = f"Se observa una tendencia al enfriamiento de aproximadamente {abs(trend_slope):.2f}°C por año."
+            trend_desc = f"A cooling trend of approximately {abs(trend_slope):.2f}°C per year is observed."
         else:
-            trend_desc = "La temperatura se ha mantenido relativamente estable."
+            trend_desc = "Temperature has remained relatively stable."
     else:
-        trend_desc = "Datos insuficientes para determinar tendencia."
+        trend_desc = "Insufficient data to determine trend."
     
     precip_prob = min(int((precip_mean / 5) * 100), 100) if precip_mean > 0 else 10
     
+    humidity_level = 'high' if h_mean > 70 else 'moderate' if h_mean > 50 else 'low'
+    
     analysis = (
-        f"Basado en el análisis de los últimos {len(years)} años, se observa un patrón consistente para esta fecha. "
-        f"La temperatura promedio histórica es de {t_mean:.1f}°C con una desviación estándar de {t_std:.1f}°C. "
+        f"Based on analysis of the last {len(years)} years, a consistent pattern is observed for this date. "
+        f"The historical average temperature is {t_mean:.1f}°C with a standard deviation of {t_std:.1f}°C. "
         f"{trend_desc} "
-        f"La humedad tiende a ser {'alta' if h_mean > 70 else 'moderada' if h_mean > 50 else 'baja'} (promedio {h_mean:.1f}%) "
-        f"y existe una probabilidad del {precip_prob}% de precipitación basada en datos históricos. "
-        f"Los vientos predominantes tienen una velocidad media de {w_mean:.1f} m/s."
+        f"Humidity tends to be {humidity_level} (average {h_mean:.1f}%) "
+        f"and there is a {precip_prob}% probability of precipitation based on historical data. "
+        f"Prevailing winds have an average speed of {w_mean:.1f} m/s."
     )
     
     return analysis
@@ -255,14 +273,14 @@ def generate_trend_analysis(
 
 def generate_notes(lat: float, lon: float, data_points: int, confidence: float) -> str:
     """
-    Genera notas explicativas sobre la predicción.
+    Generates explanatory notes about the prediction.
     """
     notes = (
-        f"Esta predicción se generó utilizando algoritmos de análisis estadístico que evalúan patrones históricos. "
-        f"Se analizaron {data_points} puntos de datos para las coordenadas (Lat: {lat:.2f}, Lon: {lon:.2f}). "
-        f"El nivel de confianza de {confidence}% refleja la consistencia de los datos históricos. "
-        f"Se recomienda verificar pronósticos actualizados más cerca de la fecha objetivo. "
-        f"Los datos históricos provienen de estaciones meteorológicas en un radio de 50km de las coordenadas especificadas."
+        f"This prediction was generated using statistical analysis algorithms that evaluate historical patterns. "
+        f"{data_points} data points were analyzed for coordinates (Lat: {lat:.2f}, Lon: {lon:.2f}). "
+        f"The confidence level of {confidence}% reflects the consistency of historical data. "
+        f"It is recommended to verify updated forecasts closer to the target date. "
+        f"Historical data comes from weather stations within a 50km radius of the specified coordinates."
     )
     
     return notes

@@ -77,8 +77,8 @@ class OpendapProvider(WeatherDataProvider):
             'User-Agent': 'Mozilla/5.0 (compatible; WeatherPredictionAPI/1.0)'
         })
         
-        print(f"🔐 Sesión configurada para usuario: {self.username}")
-        print(f"🍪 Sistema de cookies habilitado para autenticación NASA")
+        print(f"🔐 Session configured for user: {self.username}")
+        print(f"🍪 Cookie system enabled for NASA authentication")
     
     def _authenticate_with_urs(self):
         """
@@ -86,7 +86,7 @@ class OpendapProvider(WeatherDataProvider):
         Esto es necesario antes de descargar archivos de GES DISC.
         """
         try:
-            print("🔑 Autenticando con NASA EarthData URS...")
+            print("🔑 Authenticating with NASA EarthData URS...")
             
             # URL de autenticación URS
             urs_url = "https://urs.earthdata.nasa.gov/oauth/authorize"
@@ -104,14 +104,14 @@ class OpendapProvider(WeatherDataProvider):
             )
             
             if response.status_code == 200:
-                print("✅ Cookies de autenticación obtenidas")
+                print("✅ Authentication cookies obtained")
                 return True
             else:
-                print(f"⚠️  No se pudieron obtener cookies: HTTP {response.status_code}")
+                print(f"⚠️  Could not obtain cookies: HTTP {response.status_code}")
                 return False
                 
         except Exception as e:
-            print(f"⚠️  Error en autenticación URS: {e}")
+            print(f"⚠️  URS authentication error: {e}")
             return False
     
     def _get_cache_key(self, lat: float, lon: float, date: datetime) -> str:
@@ -146,10 +146,10 @@ class OpendapProvider(WeatherDataProvider):
             try:
                 with open(cache_file, 'r') as f:
                     cached_data = json.load(f)
-                    print(f"📦 Datos obtenidos del caché: {cache_file.name}")
+                    print(f"📦 Data obtained from cache: {cache_file.name}")
                     return cached_data
             except Exception as e:
-                print(f"⚠️  Error leyendo caché: {e}")
+                print(f"⚠️  Error reading cache: {e}")
                 return None
         
         return None
@@ -169,9 +169,9 @@ class OpendapProvider(WeatherDataProvider):
         try:
             with open(cache_file, 'w') as f:
                 json.dump(data, f)
-                print(f"💾 Datos guardados en caché: {cache_file.name}")
+                print(f"💾 Data saved to cache: {cache_file.name}")
         except Exception as e:
-            print(f"⚠️  Error guardando caché: {e}")
+            print(f"⚠️  Error saving cache: {e}")
         
     def fetch_historical_data(
         self,
@@ -265,7 +265,7 @@ class OpendapProvider(WeatherDataProvider):
                     return None
                     
                 except Exception as e:
-                    print(f"⚠️  Error obteniendo datos para {year}: {e}")
+                    print(f"⚠️  Error obtaining data for {year}: {e}")
                     # Si falla un año, usar estimación basada en climatología
                     return self._get_climatology_estimate(lat, lon, target_month, year)
             
@@ -284,18 +284,18 @@ class OpendapProvider(WeatherDataProvider):
                             data.append(result)
                             print(f"✅ Año {year} completado")
                     except Exception as e:
-                        print(f"❌ Error procesando {year}: {e}")
+                        print(f"❌ Error processing {year}: {e}")
                         # Agregar estimación climatológica
                         data.append(self._get_climatology_estimate(lat, lon, target_month, year))
             
             if not data:
-                raise ValueError("No se pudieron obtener datos históricos")
+                raise ValueError("Could not obtain historical data")
                 
             return pd.DataFrame(data)
             
         except Exception as e:
-            print(f"❌ Error en OpendapProvider: {e}")
-            print("📊 Usando datos de respaldo climatológicos...")
+            print(f"❌ OpendapProvider error: {e}")
+            print("📊 Using fallback climatological data...")
             return self._get_fallback_data(lat, lon, target_month, target_day, years_back)
     def _fetch_merra2_day(self, lat: float, lon: float, date: datetime) -> Dict[str, float]:
         """
@@ -310,16 +310,18 @@ class OpendapProvider(WeatherDataProvider):
             # Determinar stream MERRA-2
             stream = "400" if year >= 2011 else "300" if year >= 2001 else "200" if year >= 1992 else "100"
             
-            # Construir URL OPeNDAP con protocolo DAP4 (más rápido que DAP2 legacy)
-            collection = "M2T1NXSLV.5.12.4"
-            filename = f"MERRA2_{stream}.tavg1_2d_slv_Nx.{year}{month:02d}{day:02d}.nc4"
+            # Usar M2T1NXFLX que incluye precipitación, temperatura y otras variables
+            # Este dataset es más liviano que M2I1NXASM y tiene todas las variables necesarias
+            collection = "M2T1NXFLX.5.12.4"
+            filename = f"MERRA2_{stream}.tavg1_2d_flx_Nx.{year}{month:02d}{day:02d}.nc4"
             
             # Usar dap4:// para consultas más rápidas
             base_url = "dap4://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2"
             opendap_url = f"{base_url}/{collection}/{year}/{month:02d}/{filename}"
             
-            print(f"🌐 Consulta OPeNDAP para {date.strftime('%Y-%m-%d')} en ({lat:.2f}, {lon:.2f})")
-            print(f"   Descargando solo ~1-2 KB (punto específico)")
+            print(f"🌐 OPeNDAP query for {date.strftime('%Y-%m-%d')} at ({lat:.2f}, {lon:.2f})")
+          
+            print(f"   Descargando solo ~2-3 KB (punto específico)")
             
             # Abrir dataset remoto con pydap
             from pydap.client import open_url
@@ -361,8 +363,11 @@ class OpendapProvider(WeatherDataProvider):
             # El dataset MERRA-2 tiene múltiples mediciones por día (cada hora)
             # Extraemos temperatura máxima, mínima, promedio y sus horas
             
+            # M2T1NXFLX usa TLML (surface layer temperature) en lugar de T2M
+            temp_var = 'TLML' if 'TLML' in ds.data_vars else 'T2M' if 'T2M' in ds.data_vars else 'TS'
+            
             # Obtener array de temperaturas del día
-            temp_array = point['T2M'].values
+            temp_array = point[temp_var].values
             
             # Temperatura máxima y su índice (hora)
             temp_max_idx = int(np.argmax(temp_array))
@@ -383,15 +388,22 @@ class OpendapProvider(WeatherDataProvider):
             # Usamos la máxima como temperatura principal (lo que espera el usuario)
             temp_c = temp_c_max
             
-            print(f"🌡️  TEMPERATURA:")
+            print(f"🌡️  TEMPERATURA ({temp_var}):")
             print(f"    Máxima: {temp_c_max:.2f}°C a las {hour_max:02d}:00")
             print(f"    Mínima: {temp_c_min:.2f}°C a las {hour_min:02d}:00")
             print(f"    Promedio: {temp_c_avg:.2f}°C")
             
-            # Humedad (promedio diario)
+            # Humedad - M2T1NXFLX puede tener QLML (specific humidity)
             if 'RH2M' in ds.data_vars:
                 humidity = float(point['RH2M'].mean().values)
                 print(f"💧 HUMEDAD: {humidity:.1f}% (RH2M)")
+            elif 'QLML' in ds.data_vars:
+                qlml = float(point['QLML'].mean().values)
+                # Calcular humedad relativa desde humedad específica
+                es = 6.112 * np.exp((17.67 * temp_c) / (temp_c + 243.5))
+                e = qlml * 1013.25 / (0.622 + 0.378 * qlml)
+                humidity = min(100, max(0, (e / es) * 100))
+                print(f"💧 HUMEDAD: {humidity:.1f}% (calculada desde QLML={qlml:.6f})")
             elif 'QV2M' in ds.data_vars:
                 qv = float(point['QV2M'].mean().values)
                 # Calcular humedad relativa desde humedad específica
@@ -403,18 +415,41 @@ class OpendapProvider(WeatherDataProvider):
                 humidity = 60.0
                 print(f"💧 HUMEDAD: {humidity:.1f}% (valor por defecto)")
             
-            # Viento (promedio diario)
-            u = float(point['U10M'].mean().values) if 'U10M' in ds.data_vars else 0
-            v = float(point['V10M'].mean().values) if 'V10M' in ds.data_vars else 0
+            # Viento - M2T1NXFLX puede tener ULML/VLML o U10M/V10M
+            u = 0
+            v = 0
+            wind_var_used = None
+            
+            if 'U10M' in ds.data_vars and 'V10M' in ds.data_vars:
+                u = float(point['U10M'].mean().values)
+                v = float(point['V10M'].mean().values)
+                wind_var_used = 'U10M/V10M'
+            elif 'ULML' in ds.data_vars and 'VLML' in ds.data_vars:
+                u = float(point['ULML'].mean().values)
+                v = float(point['VLML'].mean().values)
+                wind_var_used = 'ULML/VLML'
+            else:
+                # Si no hay viento, usar valor estimado basado en la estación
+                u = 2.0
+                v = 1.0
+                wind_var_used = 'estimado'
+            
             wind_speed = np.sqrt(u**2 + v**2)
             wind_direction = (np.degrees(np.arctan2(v, u)) + 360) % 360
+            print(f"💨 VIENTO ({wind_var_used}): {wind_speed:.1f} m/s, dirección {wind_direction:.0f}°")
             
-            # Precipitación
+            # Precipitación (M2T1NXFLX tiene PRECTOT)
+            # PRECTOT está en kg/m²/s, convertir a mm/día
             precip = 0.0
             for var in ['PRECTOT', 'PRECTOTCORR', 'PRECTOTLAND']:
                 if var in ds.data_vars:
-                    precip = float(point[var].sum().values)
+                    precip_raw = float(point[var].sum().values)
+                    precip = precip_raw * 3600  # kg/m²/s * 3600 s/h = mm/día
+                    print(f"✅ Precipitación ({var}): {precip:.2f} mm/día")
                     break
+            
+            if precip == 0.0:
+                print(f"⚠️  No precipitation recorded (dry day)")
             
             # Presión
             if 'PS' in ds.data_vars:
@@ -443,7 +478,7 @@ class OpendapProvider(WeatherDataProvider):
             seasonal_factor = np.sin(2 * np.pi * (date.month - 3) / 12)
             uv_index = max(0, uv_base * (0.7 + 0.3 * seasonal_factor) * (1 - cloud_cover / 200))
             
-            print(f"✅ Datos obtenidos: Temp Max={temp_c_max:.1f}°C, Min={temp_c_min:.1f}°C, Humedad={humidity:.1f}%")
+            print(f"✅ Data obtained: Temp Max={temp_c_max:.1f}°C, Min={temp_c_min:.1f}°C, Humedad={humidity:.1f}%")
             
             return {
                 "temperature": round(temp_c, 1),  # Temperatura máxima
@@ -464,7 +499,7 @@ class OpendapProvider(WeatherDataProvider):
             }
             
         except Exception as e:
-            print(f"⚠️  Error OPeNDAP para {date}: {str(e)}")
+            print(f"⚠️  OPeNDAP error for {date}: {str(e)}")
             import traceback
             traceback.print_exc()
             return None

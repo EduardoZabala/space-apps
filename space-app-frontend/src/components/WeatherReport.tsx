@@ -19,7 +19,7 @@ type WeatherReportData = {
 
 export default function WeatherReport() {
   const [data, setData] = useState<WeatherReportData>({
-    title: 'Reporte meteorológico',
+    title: 'Weather Report',
     location: '',
     startDate: new Date().toISOString().slice(0, 10),
     endDate: new Date().toISOString().slice(0, 10),
@@ -27,7 +27,7 @@ export default function WeatherReport() {
     humidity: undefined,
     windSpeed: undefined,
     windDirection: '',
-    conditions: 'Despejado',
+    conditions: 'Clear',
     precipitation: 'Ninguna',
     visibility: '',
     forecast: '',
@@ -47,7 +47,7 @@ export default function WeatherReport() {
       const newData = { ...d, [key]: value }
       if (key === 'startDate' || key === 'endDate') {
         if (newData.startDate && newData.endDate && newData.endDate < newData.startDate) {
-          setDateError('La fecha final debe ser mayor o igual a la fecha inicio')
+          setDateError('End date must be greater than or equal to start date')
           return d
         } else {
           setDateError('')
@@ -83,20 +83,20 @@ export default function WeatherReport() {
           <div className="weather-header-content">
             <h1 className="weather-title">
               <i className="fas fa-cloud-sun"></i>
-              Reporte Meteorológico
+              Weather Report
             </h1>
             <div className="weather-actions">
               <button className="weather-btn weather-btn-secondary" onClick={() => setShowPreview((s) => !s)}>
                 <i className={showPreview ? 'fas fa-eye-slash' : 'fas fa-eye'}></i>
-                {showPreview ? 'Ocultar formulario' : 'Mostrar formulario'}
+                {showPreview ? 'Hide form' : 'Show form'}
               </button>
               <button className="weather-btn" onClick={exportJSON}>
                 <i className="fas fa-download"></i>
-                Exportar JSON
+                Export JSON
               </button>
               <button className="weather-btn weather-btn-success" onClick={onPrint}>
                 <i className="fas fa-print"></i>
-                Imprimir
+                Print
               </button>
             </div>
           </div>
@@ -108,7 +108,7 @@ export default function WeatherReport() {
               <div className="weather-form-field">
                 <label className="weather-form-label">
                   <i className="fas fa-heading"></i>
-                  Título
+                  Title
                 </label>
                 <input 
                   className="weather-form-input" 
@@ -120,20 +120,20 @@ export default function WeatherReport() {
               <div className="weather-form-field">
                 <label className="weather-form-label">
                   <i className="fas fa-map-marker-alt"></i>
-                  Ubicación
+                  Location
                 </label>
                 <input 
                   className="weather-form-input" 
                   value={data.location} 
                   onChange={(e) => update('location', e.target.value)} 
-                  placeholder="Ciudad, estación o coordenadas" 
+                  placeholder="City, station or coordinates" 
                 />
               </div>
 
               <div className="weather-form-field">
                 <label className="weather-form-label">
                   <i className="fas fa-calendar-alt"></i>
-                  Fecha inicio
+                  Start date
                 </label>
                 <input 
                   type="date" 
@@ -146,7 +146,7 @@ export default function WeatherReport() {
               <div className="weather-form-field">
                 <label className="weather-form-label">
                   <i className="fas fa-calendar-alt"></i>
-                  Fecha final
+                  End date
                 </label>
                 <input 
                   type="date" 
@@ -161,7 +161,7 @@ export default function WeatherReport() {
               <div className="weather-form-field">
                 <label className="weather-form-label">
                   <i className="fas fa-thermometer-half"></i>
-                  Temperatura (°C)
+                  Temperature (°C)
                 </label>
                 <input 
                   type="number" 
@@ -174,7 +174,7 @@ export default function WeatherReport() {
               <div className="weather-form-field">
                 <label className="weather-form-label">
                   <i className="fas fa-tint"></i>
-                  Humedad (%)
+                  Humidity (%)
                 </label>
                 <input 
                   type="number" 
@@ -187,7 +187,7 @@ export default function WeatherReport() {
               <div className="weather-form-field">
                 <label className="weather-form-label">
                   <i className="fas fa-wind"></i>
-                  Viento (m/s)
+                  Wind (m/s)
                 </label>
                 <input 
                   type="number" 
@@ -200,7 +200,7 @@ export default function WeatherReport() {
               <div className="weather-form-field">
                 <label className="weather-form-label">
                   <i className="fas fa-compass"></i>
-                  Dirección del viento
+                  Wind direction
                 </label>
                 <input 
                   className="weather-form-input" 
@@ -213,27 +213,27 @@ export default function WeatherReport() {
               <div className="weather-form-field weather-form-field-full">
                 <label className="weather-form-label">
                   <i className="fas fa-cloud"></i>
-                  Condiciones actuales
+                  Current conditions
                 </label>
                 <select 
                   className="weather-form-select" 
                   value={data.conditions} 
                   onChange={(e) => update('conditions', e.target.value)}
                 >
-                  <option>Despejado</option>
-                  <option>Parcialmente nublado</option>
-                  <option>Nublado</option>
-                  <option>Lluvia</option>
-                  <option>Tormenta</option>
-                  <option>Nieve</option>
-                  <option>Bruma/Niebla</option>
+                  <option>Clear</option>
+                  <option>Partly cloudy</option>
+                  <option>Cloudy</option>
+                  <option>Rain</option>
+                  <option>Storm</option>
+                  <option>Snow</option>
+                  <option>Mist/Fog</option>
                 </select>
               </div>
 
               <div className="weather-form-field">
                 <label className="weather-form-label">
                   <i className="fas fa-cloud-rain"></i>
-                  Precipitación
+                  Precipitation
                 </label>
                 <input 
                   className="weather-form-input" 
@@ -246,7 +246,7 @@ export default function WeatherReport() {
               <div className="weather-form-field">
                 <label className="weather-form-label">
                   <i className="fas fa-eye"></i>
-                  Visibilidad
+                  Visibility
                 </label>
                 <input 
                   className="weather-form-input" 
@@ -259,7 +259,7 @@ export default function WeatherReport() {
               <div className="weather-form-field">
                 <label className="weather-form-label">
                   <i className="fas fa-user"></i>
-                  Reportado por
+                  Reported by
                 </label>
                 <input 
                   className="weather-form-input" 
@@ -271,7 +271,7 @@ export default function WeatherReport() {
               <div className="weather-form-field weather-form-field-full">
                 <label className="weather-form-label">
                   <i className="fas fa-chart-line"></i>
-                  Pronóstico breve
+                  Brief forecast
                 </label>
                 <textarea 
                   className="weather-form-textarea" 
@@ -284,14 +284,14 @@ export default function WeatherReport() {
               <div className="weather-form-field weather-form-field-full">
                 <label className="weather-form-label">
                   <i className="fas fa-clipboard"></i>
-                  Observaciones
+                  Observations
                 </label>
                 <textarea 
                   className="weather-form-textarea" 
                   rows={3} 
                   value={data.notes} 
                   onChange={(e) => update('notes', e.target.value)} 
-                  placeholder="Detalles, fuentes, limitaciones, instrumentos usados..." 
+                  placeholder="Details, sources, limitations, instruments used..." 
                 />
               </div>
             </div>
@@ -304,14 +304,14 @@ export default function WeatherReport() {
             <div className="weather-preview-meta">
               <div className="weather-meta-item">
                 <i className="fas fa-map-marker-alt"></i>
-                <span>{data.location || 'Ubicación no especificada'}</span>
+                <span>{data.location || 'Location no especificada'}</span>
               </div>
               <div className="weather-meta-item">
                 <i className="fas fa-calendar-alt"></i>
                 <span>
                   {data.startDate && data.endDate 
-                    ? `${new Date(data.startDate).toLocaleDateString('es-ES', { dateStyle: 'long' })} - ${new Date(data.endDate).toLocaleDateString('es-ES', { dateStyle: 'long' })}`
-                    : 'Fechas no especificadas'}
+                    ? `${new Date(data.startDate).toLocaleDateString('en-US', { dateStyle: 'long' })} - ${new Date(data.endDate).toLocaleDateString('en-US', { dateStyle: 'long' })}`
+                    : 'Dates not specified'}
                 </span>
               </div>
             </div>
@@ -323,7 +323,7 @@ export default function WeatherReport() {
                 <div className="weather-stat-icon">
                   <i className="fas fa-thermometer-half"></i>
                 </div>
-                <div className="weather-stat-label">Temperatura</div>
+                <div className="weather-stat-label">Temperature</div>
                 <div className="weather-stat-value">
                   {data.temperatureC != null ? `${data.temperatureC} °C` : '—'}
                 </div>
@@ -338,7 +338,7 @@ export default function WeatherReport() {
                 <div className="weather-stat-icon">
                   <i className="fas fa-tint"></i>
                 </div>
-                <div className="weather-stat-label">Humedad</div>
+                <div className="weather-stat-label">Humidity</div>
                 <div className="weather-stat-value">
                   {data.humidity != null ? `${data.humidity} %` : '—'}
                 </div>
@@ -348,7 +348,7 @@ export default function WeatherReport() {
                 <div className="weather-stat-icon">
                   <i className="fas fa-wind"></i>
                 </div>
-                <div className="weather-stat-label">Viento</div>
+                <div className="weather-stat-label">Wind</div>
                 <div className="weather-stat-value">
                   {data.windSpeed != null ? `${data.windSpeed} m/s` : '—'}
                 </div>
@@ -358,7 +358,7 @@ export default function WeatherReport() {
                 <div className="weather-stat-icon">
                   <i className="fas fa-compass"></i>
                 </div>
-                <div className="weather-stat-label">Dirección</div>
+                <div className="weather-stat-label">Direction</div>
                 <div className="weather-stat-value">
                   {data.windDirection || '—'}
                 </div>
@@ -368,27 +368,27 @@ export default function WeatherReport() {
             <div className="weather-section">
               <h3 className="weather-section-title">
                 <i className="fas fa-info-circle"></i>
-                Información General
+                General Information
               </h3>
               <div className="weather-info-grid">
                 <div className="weather-info-item">
                   <i className="fas fa-cloud"></i>
                   <div className="weather-info-content">
-                    <div className="weather-info-label">Condiciones</div>
+                    <div className="weather-info-label">Conditions</div>
                     <div className="weather-info-value">{data.conditions || '—'}</div>
                   </div>
                 </div>
                 <div className="weather-info-item">
                   <i className="fas fa-cloud-rain"></i>
                   <div className="weather-info-content">
-                    <div className="weather-info-label">Precipitación</div>
+                    <div className="weather-info-label">Precipitation</div>
                     <div className="weather-info-value">{data.precipitation || '—'}</div>
                   </div>
                 </div>
                 <div className="weather-info-item">
                   <i className="fas fa-eye"></i>
                   <div className="weather-info-content">
-                    <div className="weather-info-label">Visibilidad</div>
+                    <div className="weather-info-label">Visibility</div>
                     <div className="weather-info-value">{data.visibility || '—'}</div>
                   </div>
                 </div>
@@ -399,7 +399,7 @@ export default function WeatherReport() {
               <div className="weather-section">
                 <h3 className="weather-section-title">
                   <i className="fas fa-chart-line"></i>
-                  Pronóstico
+                  Forecast
                 </h3>
                 <div className="weather-text-content">
                   {data.forecast}
@@ -411,7 +411,7 @@ export default function WeatherReport() {
               <div className="weather-section">
                 <h3 className="weather-section-title">
                   <i className="fas fa-clipboard"></i>
-                  Observaciones
+                  Observations
                 </h3>
                 <div className="weather-text-content">
                   {data.notes}
@@ -421,7 +421,7 @@ export default function WeatherReport() {
 
             {data.reporter && (
               <div className="weather-reporter">
-                <i className="fas fa-user"></i> Reportado por: <strong>{data.reporter}</strong>
+                <i className="fas fa-user"></i> Reported by: <strong>{data.reporter}</strong>
               </div>
             )}
           </div>

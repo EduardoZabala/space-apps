@@ -12,8 +12,8 @@ interface LocationSearchProps {
 }
 
 export default function LocationSearch({ onSearch, disabled = false }: LocationSearchProps) {
-  const [latitude, setLatitude] = useState('')
-  const [longitude, setLongitude] = useState('')
+  const [latitude, setLatitudee] = useState('')
+  const [longitude, setLongitudee] = useState('')
   const [targetDate, setTargetDate] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -28,7 +28,7 @@ export default function LocationSearch({ onSearch, disabled = false }: LocationS
     e.preventDefault()
     
     if (!latitude || !longitude || !targetDate) {
-      alert('Por favor completa todos los campos')
+      alert('Please fill in all fields')
       return
     }
 
@@ -36,17 +36,17 @@ export default function LocationSearch({ onSearch, disabled = false }: LocationS
     const lon = parseFloat(longitude)
 
     if (isNaN(lat) || isNaN(lon)) {
-      alert('Las coordenadas deben ser números válidos')
+      alert('Coordinates must be valid numbers')
       return
     }
 
     if (lat < -90 || lat > 90) {
-      alert('La latitud debe estar entre -90 y 90')
+      alert('Latitude must be between -90 and 90')
       return
     }
 
     if (lon < -180 || lon > 180) {
-      alert('La longitud debe estar entre -180 y 180')
+      alert('Longitude must be between -180 and 180')
       return
     }
 
@@ -55,7 +55,7 @@ export default function LocationSearch({ onSearch, disabled = false }: LocationS
     today.setHours(0, 0, 0, 0)
 
     if (selectedDate <= today) {
-      alert('La fecha debe ser futura (a partir de mañana)')
+      alert('Date must be in the future (from tomorrow onwards)')
       return
     }
 
@@ -78,7 +78,7 @@ export default function LocationSearch({ onSearch, disabled = false }: LocationS
           <div className="weather-header-content">
             <h1 className="weather-title">
               <i className="fas fa-crystal-ball"></i>
-              Predicción Meteorológica Basada en Historial
+              Historical Weather Prediction
             </h1>
           </div>
         </div>
@@ -87,10 +87,10 @@ export default function LocationSearch({ onSearch, disabled = false }: LocationS
           <div className="intro-icon">
             <i className="fas fa-chart-line"></i>
           </div>
-          <h2>¿Cómo funciona?</h2>
+          <h2>How does it work?</h2>
           <p>
-            Nuestro sistema analiza datos históricos de múltiples años para la ubicación y fecha específica
-            que ingreses, generando una predicción meteorológica basada en patrones climáticos pasados.
+            Our system analyzes historical data from multiple years for the specific location and date
+            you enter, generating a weather prediction based on past climate patterns.
           </p>
         </div>
 
@@ -99,41 +99,41 @@ export default function LocationSearch({ onSearch, disabled = false }: LocationS
             <div className="search-section">
               <h3 className="search-section-title">
                 <i className="fas fa-map-marked-alt"></i>
-                Ubicación (Coordenadas Geográficas)
+                Location (Geographic Coordinates)
               </h3>
               <div className="search-form-grid">
                 <div className="weather-form-field">
                   <label className="weather-form-label">
                     <i className="fas fa-globe-americas"></i>
-                    Latitud
+                    Latitude
                   </label>
                   <input
                     type="number"
                     step="any"
                     className="weather-form-input"
                     value={latitude}
-                    onChange={(e) => setLatitude(e.target.value)}
+                    onChange={(e) => setLatitudee(e.target.value)}
                     placeholder="Ej: 4.60971"
                     required
                   />
-                  <small className="form-hint">Rango: -90 a 90</small>
+                  <small className="form-hint">Range: -90 a 90</small>
                 </div>
 
                 <div className="weather-form-field">
                   <label className="weather-form-label">
                     <i className="fas fa-globe-americas"></i>
-                    Longitud
+                    Longitude
                   </label>
                   <input
                     type="number"
                     step="any"
                     className="weather-form-input"
                     value={longitude}
-                    onChange={(e) => setLongitude(e.target.value)}
+                    onChange={(e) => setLongitudee(e.target.value)}
                     placeholder="Ej: -74.08175"
                     required
                   />
-                  <small className="form-hint">Rango: -180 a 180</small>
+                  <small className="form-hint">Range: -180 a 180</small>
                 </div>
               </div>
             </div>
@@ -141,13 +141,13 @@ export default function LocationSearch({ onSearch, disabled = false }: LocationS
             <div className="search-section">
               <h3 className="search-section-title">
                 <i className="fas fa-calendar-day"></i>
-                Fecha Futura a Predecir
+                Future Date to Predict
               </h3>
               <div className="search-form-grid">
                 <div className="weather-form-field weather-form-field-full">
                   <label className="weather-form-label">
                     <i className="fas fa-calendar-alt"></i>
-                    Selecciona una fecha futura
+                    Select a future date
                   </label>
                   <input
                     type="date"
@@ -158,7 +158,7 @@ export default function LocationSearch({ onSearch, disabled = false }: LocationS
                     required
                   />
                   <small className="form-hint">
-                    El sistema analizará datos históricos de esta fecha en años anteriores
+                    The system will analyze historical data from this date in previous years
                   </small>
                 </div>
               </div>
@@ -173,12 +173,12 @@ export default function LocationSearch({ onSearch, disabled = false }: LocationS
                 {isLoading || disabled ? (
                   <>
                     <i className="fas fa-spinner fa-spin"></i>
-                    Generando...
+                    Generating...
                   </>
                 ) : (
                   <>
                     <i className="fas fa-brain"></i>
-                    Generar Predicción
+                    Generate Prediction
                   </>
                 )}
               </button>
@@ -191,24 +191,24 @@ export default function LocationSearch({ onSearch, disabled = false }: LocationS
             <div className="info-card-icon">
               <i className="fas fa-database"></i>
             </div>
-            <h4>Análisis Histórico</h4>
-            <p>Procesamos datos meteorológicos de múltiples años para encontrar patrones climáticos</p>
+            <h4>Historical Analysis</h4>
+            <p>We process weather data from multiple years to find climate patterns</p>
           </div>
 
           <div className="info-card">
             <div className="info-card-icon">
               <i className="fas fa-brain"></i>
             </div>
-            <h4>IA y Machine Learning</h4>
-            <p>Algoritmos inteligentes generan predicciones precisas basadas en el historial</p>
+            <h4>AI and Machine Learning</h4>
+            <p>Intelligent algorithms generate accurate predictions based on historical data</p>
           </div>
 
           <div className="info-card">
             <div className="info-card-icon">
               <i className="fas fa-file-download"></i>
             </div>
-            <h4>Reporte Descargable</h4>
-            <p>Exporta los resultados a Excel o imprímelos para tus registros</p>
+            <h4>Downloadable Report</h4>
+            <p>Export results to Excel or print them for your records</p>
           </div>
         </div>
       </div>
