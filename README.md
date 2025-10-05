@@ -5,7 +5,7 @@
 - Juan Sebastian Echeverri Gallego
 - Juan David Velasquez Murillo
 - Edwin Ramirez Gonzalez
-- Jhon Eduardo Zabala Garzon
+- Jhon Eduardo Zabala Garzon <br>
 A full-stack weather prediction application that analyzes historical data to forecast future weather patterns. Built with FastAPI (Python) and React (TypeScript).
 
 ![Project Status](https://img.shields.io/badge/status-active-success.svg)
